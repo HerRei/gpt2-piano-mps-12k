@@ -8,7 +8,7 @@ Symbolic piano training and generation built around a GPT-2 style language model
 python3 scripts/prepare_12k_split.py
 python3 scripts/augment_train_transpose.py
 python3 scripts/tokenize_12k_augmented.py
-python3 scripts/train_gpt2_piano_12k.py
+python3 scripts/train_gpt2_piano_12k.py --train-from-scratch
 python3 scripts/generation_pipeline.py --dry-run
 ```
 
@@ -16,6 +16,7 @@ Useful shortcuts:
 
 ```bash
 make test
+make smoke-test
 make profiles
 make pipeline-dry-run
 ```
@@ -32,6 +33,8 @@ The main 12k workflow is:
 6. generate continuations from saved checkpoints
 7. optionally export checkpoints to ONNX
 
+Each saved training checkpoint now includes `trainer_state.pt`, which restores AdamW state, the cosine warmup schedule, and RNG state instead of resuming from weights alone.
+
 Current checkpoint shape:
 
 - `vocab_size=423`
@@ -40,23 +43,48 @@ Current checkpoint shape:
 - `n_head=12`
 - `n_embd=768`
 
-Current saved checkpoint stats in this working tree:
+Example local checkpoint stats from the authoring machine:
 
 - `epoch_02`: `val_loss=1.4298260553092612`
 - `epoch_04`: `val_loss=1.5310632007374627`
 - `checkpoints/best`: epoch 2
+
+Those checkpoint directories are intentionally not tracked in Git, so a fresh clone will need its own training run before the generation pipeline has anything to compare.
 
 ## Repository Layout
 
 - `scripts/prepare_12k_split.py`: create train, validation, and test splits
 - `scripts/augment_train_transpose.py`: add transposed piano variants to the training split
 - `scripts/tokenize_12k_augmented.py`: tokenize the 12k dataset
+- `scripts/tokenizer_utils.py`: shared Miditok REMI setup and token-sequence validation
 - `scripts/train_gpt2_piano_12k.py`: train the main 12k model
 - `scripts/generate_piano_sample.py`: generate a continuation from one checkpoint
 - `scripts/generation_pipeline.py`: batch-run epoch 2 and epoch 4 generations
 - `configs/generation_prompt_profiles.json`: human-facing prompt presets for the batch pipeline
 - `docs/`: static site ready for GitHub Pages
 - `.github/workflows/`: CI and Pages workflows
+
+## Training Commands
+
+Run a fresh training job:
+
+```bash
+python3 scripts/train_gpt2_piano_12k.py --train-from-scratch
+```
+
+Resume from a saved epoch checkpoint:
+
+```bash
+python3 scripts/train_gpt2_piano_12k.py --resume-from checkpoints/epoch_02
+```
+
+The trainer now exposes the main run settings as CLI flags instead of hiding them in the script body. Use `python3 scripts/train_gpt2_piano_12k.py --help` to adjust epochs, batch size, gradient accumulation, checkpoint directory, and resume behavior.
+
+## Data Split Assumptions
+
+`scripts/prepare_12k_split.py` does a shuffled file-level split and writes `data/splits/split_manifest.json` with the seed, ratios, and split counts.
+
+That is a reasonable baseline for a personal piano corpus, but it does not deduplicate alternate takes, near-duplicates, or related arrangements. If your source folder contains linked performances, group them before splitting or you can leak musical material across train, validation, and test.
 
 ## Generation Pipeline
 
@@ -141,9 +169,10 @@ This repository now includes:
 
 - `.gitignore` rules that keep data, checkpoints, exports, logs, and vendored binaries out of version control
 - a plain MIT `LICENSE`
-- a lightweight CI workflow that runs the unit tests
+- a two-stage CI workflow with fast unit tests plus a dependency-backed smoke test
 - a GitHub Pages workflow plus a static site in `docs/`
 - a `Makefile` for common commands
+- a `requirements-smoke.txt` file for the dependency smoke path
 - a `CONTRIBUTING.md` checklist for local review and first upload
 
 The top-level scripts also now resolve the repository root from the checkout itself instead of assuming the repo lives at `~/gpt2-piano-mps-12k`.
@@ -156,11 +185,20 @@ export GPT2_PIANO_ROOT=/absolute/path/to/gpt2-piano-mps-12k
 
 ## Tests
 
-The test suite uses only the Python standard library:
+Fast local tests:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
+
+Dependency-backed smoke test:
+
+```bash
+python3 -m pip install -r requirements-smoke.txt
+python3 -m unittest tests.test_dependency_smoke
+```
+
+The smoke test builds a tiny MIDI clip, tokenizes it with Miditok REMI, and runs a small GPT-2 forward pass so CI proves the real dependency stack still works.
 
 ## Git Hygiene
 

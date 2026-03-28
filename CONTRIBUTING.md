@@ -8,10 +8,18 @@ Run the lightweight test suite before pushing:
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
+Run the dependency-backed smoke check when you want to validate the real ML stack locally:
+
+```bash
+python3 -m pip install -r requirements-smoke.txt
+python3 -m unittest tests.test_dependency_smoke
+```
+
 Useful shortcuts:
 
 ```bash
 make test
+make smoke-test
 make pipeline-dry-run
 make docs-example
 ```
@@ -28,6 +36,8 @@ This repository is set up to keep large artifacts out of version control:
 - `.onnx_export_vendor/`
 
 Keep generated outputs local. The tracked repository should mostly contain source, docs, tests, and small configuration files.
+
+The split script writes `data/splits/split_manifest.json` with the random seed, ratios, and a note about file-level leakage risk. If your dataset contains alternate takes or duplicate arrangements, regroup those before splitting.
 
 ## Before the first GitHub push
 

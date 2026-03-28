@@ -1,13 +1,12 @@
 from pathlib import Path
 import json
-import os
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import get_context
 
 import numpy as np
-from miditok import REMI, TokenizerConfig
 
 from _paths import ROOT
+from tokenizer_utils import build_remi_tokenizer, token_ids_array
 
 SPLITS = ROOT / "data" / "splits"
 
@@ -22,36 +21,14 @@ for split in ["train", "validation", "test"]:
     (OUT / split).mkdir(parents=True, exist_ok=True)
 
 
-def build_tokenizer():
-    config = TokenizerConfig(
-        use_programs=False,
-        one_token_stream_for_programs=True,
-        use_rests=True,
-        use_tempos=True,
-        use_time_signatures=True,
-        use_sustain_pedals=True,
-        num_velocities=32,
-        beat_res={(0, 4): 8, (4, 12): 4},
-    )
-    return REMI(tokenizer_config=config)
-
-
 def tokenize_one(job):
     split, idx, src_str = job
     src = Path(src_str)
     out_dir = OUT / split
 
     try:
-        tokenizer = build_tokenizer()
-        tokens = tokenizer(str(src))
-
-        if isinstance(tokens, list):
-            if len(tokens) == 0:
-                return {"ok": False, "split": split, "file": src.name, "reason": "empty token list"}
-            first = tokens[0]
-            ids = np.asarray(first.ids if hasattr(first, "ids") else first, dtype=np.int32)
-        else:
-            ids = np.asarray(tokens.ids if hasattr(tokens, "ids") else tokens, dtype=np.int32)
+        tokenizer = build_remi_tokenizer()
+        ids = token_ids_array(tokenizer(str(src)))
 
         if len(ids) < 32:
             return {"ok": False, "split": split, "file": src.name, "reason": "too short"}
@@ -74,7 +51,7 @@ def tokenize_one(job):
 
 def main():
     # Save tokenizer metadata once from the main process
-    tokenizer = build_tokenizer()
+    tokenizer = build_remi_tokenizer()
     tokenizer.save(str(TOK_PATH))
     vocab_size = int(getattr(tokenizer, "vocab_size", len(tokenizer)))
 
@@ -126,6 +103,7 @@ def main():
         "tokenization": "REMI",
         "augmentation": False,
         "bpe": False,
+        "single_token_stream_required": True,
         "parallel": True,
         "max_workers": MAX_WORKERS,
     }

@@ -1,9 +1,12 @@
 PYTHON ?= python3
 
-.PHONY: test pipeline pipeline-dry-run pipeline-epoch2 pipeline-epoch4 profiles docs-example docs-serve
+.PHONY: test smoke-test pipeline pipeline-dry-run pipeline-epoch2 pipeline-epoch4 profiles docs-example docs-serve
 
 test:
 	$(PYTHON) -m unittest discover -s tests -p 'test_*.py'
+
+smoke-test:
+	$(PYTHON) -m unittest tests.test_dependency_smoke
 
 pipeline:
 	$(PYTHON) scripts/generation_pipeline.py

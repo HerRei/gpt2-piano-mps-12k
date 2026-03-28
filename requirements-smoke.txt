@@ -1,0 +1,7 @@
+numpy>=1.26
+pretty_midi>=0.2.10
+miditok>=3.0
+symusic>=0.5
+torch>=2.2
+transformers>=4.40
+safetensors>=0.4
