@@ -173,7 +173,6 @@ This repository now includes:
 - a GitHub Pages workflow plus a static site in `docs/`
 - a `Makefile` for common commands
 - a `requirements-smoke.txt` file for the dependency smoke path
-- a `CONTRIBUTING.md` checklist for local review and first upload
 
 The top-level scripts also now resolve the repository root from the checkout itself instead of assuming the repo lives at `~/gpt2-piano-mps-12k`.
 
