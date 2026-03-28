@@ -105,6 +105,16 @@ Each pipeline run writes:
 - metadata JSON files
 - a `pipeline_manifest.json` summary
 
+## Interactive Example
+
+The repository now includes a featured generated sample on the GitHub Pages site in `docs/`.
+
+- Local preview: `make docs-serve`, then open `http://localhost:8000`
+- Rebuild the featured sample assets: `make docs-example`
+- Featured sample MIDI: [docs/assets/generated-example.mid](/Users/hermesreisner/gpt2-piano-mps-12k/docs/assets/generated-example.mid)
+
+The current featured example was selected by running an expanded search on `checkpoints/best` and keeping the strongest balanced-preset continuation from validation prompt 1. Its saved heuristic score is `4.999121`.
+
 ## Prompt Guidance
 
 This model is prompt-conditioned by MIDI or token prefixes, not by natural language. The practical way to steer it is to pass a short seed MIDI with the musical behavior you want.

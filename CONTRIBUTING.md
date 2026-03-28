@@ -13,6 +13,7 @@ Useful shortcuts:
 ```bash
 make test
 make pipeline-dry-run
+make docs-example
 ```
 
 ## Working with local artifacts

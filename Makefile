@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: test pipeline pipeline-dry-run pipeline-epoch2 pipeline-epoch4 profiles docs-serve
+.PHONY: test pipeline pipeline-dry-run pipeline-epoch2 pipeline-epoch4 profiles docs-example docs-serve
 
 test:
 	$(PYTHON) -m unittest discover -s tests -p 'test_*.py'
@@ -19,6 +19,9 @@ pipeline-epoch4:
 
 profiles:
 	$(PYTHON) scripts/generation_pipeline.py --list-profiles
+
+docs-example:
+	/opt/homebrew/anaconda3/envs/gpt2piano/bin/python scripts/build_docs_example.py
 
 docs-serve:
 	$(PYTHON) -m http.server 8000 -d docs
