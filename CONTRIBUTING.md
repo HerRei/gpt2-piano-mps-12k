@@ -49,4 +49,4 @@ The current working tree is clean for future commits, but the existing Git histo
 
 ## Pages
 
-The static site in `docs/` is ready for GitHub Pages. After the repository is on GitHub, set Pages to deploy from GitHub Actions and the included workflow will publish the site.
+The static site in `docs/` is ready for GitHub Pages. For the first deployment, either add a `PAGES_ENABLEMENT_SETTING` repository setting with repo admin or Pages write rights, or open `Settings -> Pages`, set the source to `GitHub Actions`, and re-run the workflow once.
