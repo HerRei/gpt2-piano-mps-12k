@@ -4,6 +4,7 @@ import os
 import random
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import torch
@@ -232,7 +233,7 @@ def extract_ids_from_tokseq(seq) -> list[int]:
     return list(seq.ids)
 
 
-def load_prompt_source_ids(args, tokenizer: REMI, prompt_index: int | None = None) -> tuple[list[int], str]:
+def load_prompt_source_ids(args, tokenizer: REMI, prompt_index: Optional[int] = None) -> tuple[list[int], str]:
     if args.prompt_midi is not None and args.prompt_tokens is not None:
         raise ValueError("use only one of --prompt-midi or --prompt-tokens")
 

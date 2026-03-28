@@ -52,4 +52,4 @@ env/
 *.safetensors
 *.log
 
-!docs/assets/*.mid
+!examples/*.mid
