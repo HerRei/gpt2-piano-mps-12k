@@ -582,10 +582,10 @@ def make_optimizer(model, args):
 
 
 def make_scheduler(optimizer, args, total_steps: int, start_step: int):
-    if start_step <= 0:
-        for group in optimizer.param_groups:
+    for group in optimizer.param_groups:
+        group.setdefault("initial_lr", args.learning_rate)
+        if start_step <= 0:
             group["lr"] = args.learning_rate
-            group["initial_lr"] = args.learning_rate
 
     return get_cosine_schedule_with_warmup(
         optimizer,

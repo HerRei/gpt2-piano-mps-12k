@@ -226,6 +226,13 @@ git push -u origin main
 
 `git remote -v` lets you confirm that `origin` points at the GitHub repository you expect before pushing.
 
+## Pages Setup
+
+The Pages workflow supports two first-run paths:
+
+- add a repository secret named `PAGES_ENABLEMENT_TOKEN` with repo admin or Pages write rights and the workflow will try to enable Pages automatically
+- or go to `Settings -> Pages`, set `Source` to `GitHub Actions`, and re-run the workflow once
+
 ## Upstream Context
 
 This project lives in the same symbolic-music transformer lineage as MMM, but it is not an MMM tokenizer implementation. The 12k run in this folder uses Miditok REMI rather than MMM.

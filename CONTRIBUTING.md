@@ -50,4 +50,4 @@ That avoids publishing the old 2.29 GiB packed history.
 
 ## Pages
 
-The static site in `docs/` is ready for GitHub Pages. After the repository is on GitHub, set Pages to deploy from GitHub Actions and the included workflow will publish the site.
+The static site in `docs/` is ready for GitHub Pages. For the first deployment, either add a `PAGES_ENABLEMENT_TOKEN` repository secret with repo admin or Pages write rights, or open `Settings -> Pages`, set the source to `GitHub Actions`, and re-run the workflow once.
