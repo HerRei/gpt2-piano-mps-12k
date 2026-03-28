@@ -5,14 +5,18 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from _paths import ROOT
 from pipeline_utils import (
+    PipelineJob,
     build_generation_command,
     checkpoint_dir,
+    format_profile_listing,
     load_prompt_profiles,
     normalize_epoch,
     parse_csv,
+    select_profile_names,
 )
 
 
@@ -38,7 +42,7 @@ def parse_args():
         "--profiles",
         type=str,
         default=",".join(DEFAULT_PROFILES),
-        help="Comma-separated prompt profile names from configs/generation_prompt_profiles.json.",
+        help="Comma-separated prompt profile names, or 'all'.",
     )
     parser.add_argument(
         "--profiles-file",
@@ -87,19 +91,23 @@ def parse_args():
         action="store_true",
         help="Print planned commands and write the manifest without running generation.",
     )
+    parser.add_argument(
+        "--list-profiles",
+        action="store_true",
+        help="Print the available prompt profiles and exit.",
+    )
     return parser.parse_args()
 
 
-def main():
-    args = parse_args()
+def resolve_output_dir(requested_dir: Optional[Path]) -> Path:
+    if requested_dir is not None:
+        return requested_dir.expanduser().resolve()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return (ROOT / "exports" / "pipeline_runs" / timestamp).resolve()
 
-    if args.prompt_midi is not None and args.prompt_tokens is not None:
-        raise ValueError("use only one of --prompt-midi or --prompt-tokens")
 
-    profiles_file = args.profiles_file.expanduser().resolve()
-    profiles = load_prompt_profiles(profiles_file)
-
-    requested_profile_names = parse_csv(args.profiles) or DEFAULT_PROFILES
+def build_jobs(args, profiles_file: Path, profiles) -> tuple[list[str], list[PipelineJob], Path]:
+    requested_profile_names = select_profile_names(args.profiles, sorted(profiles))
     selected_profiles = []
     for profile_name in requested_profile_names:
         if profile_name not in profiles:
@@ -110,23 +118,10 @@ def main():
     if not epochs:
         raise ValueError("at least one epoch is required")
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = args.output_dir
-    if output_dir is None:
-        output_dir = ROOT / "exports" / "pipeline_runs" / timestamp
-    output_dir = output_dir.expanduser().resolve()
+    output_dir = resolve_output_dir(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    manifest = {
-        "created_at": datetime.now().isoformat(timespec="seconds"),
-        "root": str(ROOT),
-        "profiles_file": str(profiles_file),
-        "epochs": epochs,
-        "profile_names": requested_profile_names,
-        "dry_run": bool(args.dry_run),
-        "jobs": [],
-    }
-
+    jobs: list[PipelineJob] = []
     job_counter = 0
     for epoch in epochs:
         checkpoint = checkpoint_dir(ROOT, epoch)
@@ -152,31 +147,72 @@ def main():
                 prompt_tokens=args.prompt_tokens.expanduser().resolve() if args.prompt_tokens else None,
                 num_candidates_override=args.num_candidates,
             )
+            jobs.append(
+                PipelineJob(
+                    epoch=epoch,
+                    checkpoint=checkpoint,
+                    output_dir=epoch_output_dir,
+                    profile=profile,
+                    seed=seed,
+                    command=command,
+                )
+            )
 
-            job = {
-                "epoch": epoch,
-                "checkpoint": str(checkpoint),
-                "profile": profile.name,
-                "description": profile.description,
-                "seed": seed,
-                "output_dir": str(epoch_output_dir),
-                "command": command,
-                "command_shell": " ".join(shlex.quote(part) for part in command),
-                "status": "planned",
-            }
-            manifest["jobs"].append(job)
+    return requested_profile_names, jobs, output_dir
+
+
+def build_manifest(args, profiles_file: Path, profile_names: list[str], jobs: list[PipelineJob]) -> dict:
+    return {
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "root": str(ROOT),
+        "profiles_file": str(profiles_file),
+        "epochs": sorted({job.epoch for job in jobs}),
+        "profile_names": profile_names,
+        "dry_run": bool(args.dry_run),
+        "jobs": [job.to_manifest_record() for job in jobs],
+    }
+
+
+def print_job_plan(jobs: list[PipelineJob], dry_run: bool) -> None:
+    mode = "dry run" if dry_run else "execution"
+    print(f"Pipeline mode: {mode}", flush=True)
+    print(f"Jobs queued: {len(jobs)}", flush=True)
+    for job in jobs:
+        print(
+            f"- epoch_{job.epoch:02d} | {job.profile.name} | seed={job.seed} | "
+            f"output={job.output_dir}",
+            flush=True,
+        )
+
+
+def main():
+    args = parse_args()
+
+    if args.prompt_midi is not None and args.prompt_tokens is not None:
+        raise ValueError("use only one of --prompt-midi or --prompt-tokens")
+
+    profiles_file = args.profiles_file.expanduser().resolve()
+    profiles = load_prompt_profiles(profiles_file)
+
+    if args.list_profiles:
+        print(format_profile_listing(profiles))
+        return
+
+    requested_profile_names, jobs, output_dir = build_jobs(args, profiles_file, profiles)
+    manifest = build_manifest(args, profiles_file, requested_profile_names, jobs)
+    print_job_plan(jobs, dry_run=args.dry_run)
 
     manifest_path = output_dir / "pipeline_manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2))
 
-    for job in manifest["jobs"]:
-        print(job["command_shell"], flush=True)
+    for index, job in enumerate(jobs):
+        print(" ".join(shlex.quote(part) for part in job.command), flush=True)
         if args.dry_run:
-            job["status"] = "dry_run"
+            manifest["jobs"][index]["status"] = "dry_run"
             continue
 
-        subprocess.run(job["command"], cwd=ROOT, check=True)
-        job["status"] = "completed"
+        subprocess.run(job.command, cwd=ROOT, check=True)
+        manifest["jobs"][index]["status"] = "completed"
         manifest_path.write_text(json.dumps(manifest, indent=2))
 
     manifest_path.write_text(json.dumps(manifest, indent=2))

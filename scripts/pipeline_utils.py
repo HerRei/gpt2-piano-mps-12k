@@ -1,7 +1,7 @@
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
-import json
 
 
 @dataclass(frozen=True)
@@ -17,6 +17,33 @@ class PromptProfile:
     num_candidates: int
     cpu_threads: int
     seed_offset: int = 0
+
+
+@dataclass(frozen=True)
+class PipelineJob:
+    epoch: int
+    checkpoint: Path
+    output_dir: Path
+    profile: PromptProfile
+    seed: int
+    command: List[str]
+    status: str = "planned"
+
+    @property
+    def run_name(self) -> str:
+        return f"epoch{self.epoch:02d}_{self.profile.name}"
+
+    def to_manifest_record(self) -> Dict[str, object]:
+        return {
+            "epoch": self.epoch,
+            "checkpoint": str(self.checkpoint),
+            "profile": self.profile.name,
+            "description": self.profile.description,
+            "seed": self.seed,
+            "output_dir": str(self.output_dir),
+            "command": self.command,
+            "status": self.status,
+        }
 
 
 def parse_csv(spec: Optional[str]) -> List[str]:
@@ -62,6 +89,25 @@ def load_prompt_profiles(path: Path) -> Dict[str, PromptProfile]:
             seed_offset=int(config.get("seed_offset", 0)),
         )
     return profiles
+
+
+def select_profile_names(spec: Optional[str], available_names: List[str]) -> List[str]:
+    requested = parse_csv(spec)
+    if not requested or requested == ["all"]:
+        return list(available_names)
+    return requested
+
+
+def format_profile_listing(profiles: Dict[str, PromptProfile]) -> str:
+    lines = ["Available prompt profiles:"]
+    for name in sorted(profiles):
+        profile = profiles[name]
+        lines.append(
+            f"- {profile.name}: prompt_index={profile.prompt_index}, "
+            f"position={profile.prompt_position}, preset={profile.preset} "
+            f"| {profile.description}"
+        )
+    return "\n".join(lines)
 
 
 def build_generation_command(

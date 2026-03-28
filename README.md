@@ -1,20 +1,38 @@
 # GPT-2 Piano MPS 12k
 
-This repository contains a local symbolic-piano training run built around a GPT-2 style language model, a Miditok REMI tokenizer, and an Apple Silicon friendly workflow that trains on MPS but generates on CPU. The current run targets a 12k-scale piano MIDI collection staged under `data/raw/source_midis`, expands the training split with pitch transposition, tokenizes the result, trains a 12-layer GPT-2 model, and generates continuation samples from saved checkpoints.
+Symbolic piano training and generation built around a GPT-2 style language model, Miditok REMI tokenization, and an Apple Silicon workflow that trains on MPS and generates on CPU.
 
-## What We Did Here
+## Quick Start
 
-The top-level 12k workflow in this repo is:
+```bash
+python3 scripts/prepare_12k_split.py
+python3 scripts/augment_train_transpose.py
+python3 scripts/tokenize_12k_augmented.py
+python3 scripts/train_gpt2_piano_12k.py
+python3 scripts/generation_pipeline.py --dry-run
+```
 
-1. Prepare a train/validation/test split from `data/raw/source_midis`.
-2. Augment the training split with safe piano transpositions at `-3, -2, -1, +1, +2, +3` semitones.
-3. Tokenize MIDI files with Miditok's REMI representation into NumPy token arrays.
-4. Train a GPT-2 style autoregressive model on 2048-token windows using MPS when available.
-5. Save checkpoints by epoch and keep a `best` checkpoint based on validation loss.
-6. Generate piano continuations from saved checkpoints using prompt MIDI or prompt token slices.
-7. Optionally export checkpoints to ONNX.
+Useful shortcuts:
 
-The current saved model shape is consistent across `epoch_02` and `epoch_04`:
+```bash
+make test
+make profiles
+make pipeline-dry-run
+```
+
+## What Is In This Repo
+
+The main 12k workflow is:
+
+1. split raw MIDI files from `data/raw/source_midis`
+2. augment the training split with safe piano transpositions
+3. tokenize the augmented corpus with Miditok REMI
+4. train a 12-layer GPT-2 style model on 2048-token windows
+5. save checkpoints per epoch and keep a `best` checkpoint
+6. generate continuations from saved checkpoints
+7. optionally export checkpoints to ONNX
+
+Current checkpoint shape:
 
 - `vocab_size=423`
 - `n_positions=2048`
@@ -22,40 +40,47 @@ The current saved model shape is consistent across `epoch_02` and `epoch_04`:
 - `n_head=12`
 - `n_embd=768`
 
-From the saved checkpoint stats currently in this folder:
+Current saved checkpoint stats in this working tree:
 
-- `epoch_02` reached `val_loss=1.4298260553092612`
-- `epoch_04` reached `val_loss=1.5310632007374627`
-- `checkpoints/best` currently points to epoch 2
+- `epoch_02`: `val_loss=1.4298260553092612`
+- `epoch_04`: `val_loss=1.5310632007374627`
+- `checkpoints/best`: epoch 2
 
 ## Repository Layout
 
-- `scripts/prepare_12k_split.py`: split the raw MIDI collection.
-- `scripts/augment_train_transpose.py`: expand the training set with pitch-shifted copies.
-- `scripts/tokenize_12k_augmented.py`: tokenize the augmented train split and untouched validation/test splits.
-- `scripts/train_gpt2_piano_12k.py`: train the 12k GPT-2 piano model.
-- `scripts/generate_piano_sample.py`: generate continuations from a checkpoint and prompt.
-- `scripts/generation_pipeline.py`: batch-generate music from the epoch 2 and epoch 4 checkpoints.
-- `configs/generation_prompt_profiles.json`: named prompt profiles used by the batch pipeline.
-- `tests/`: unit tests for the new helper logic and pipeline command construction.
+- `scripts/prepare_12k_split.py`: create train, validation, and test splits
+- `scripts/augment_train_transpose.py`: add transposed piano variants to the training split
+- `scripts/tokenize_12k_augmented.py`: tokenize the 12k dataset
+- `scripts/train_gpt2_piano_12k.py`: train the main 12k model
+- `scripts/generate_piano_sample.py`: generate a continuation from one checkpoint
+- `scripts/generation_pipeline.py`: batch-run epoch 2 and epoch 4 generations
+- `configs/generation_prompt_profiles.json`: human-facing prompt presets for the batch pipeline
+- `docs/`: static site ready for GitHub Pages
+- `.github/workflows/`: CI and Pages workflows
 
 ## Generation Pipeline
 
-The new pipeline script lets you batch-generate from `epoch_02` and `epoch_04` using named prompt profiles that map to validation prompt slices already explored in this repo.
+The pipeline is meant to be easy to use from the terminal rather than treated as an internal helper.
 
-Dry-run the planned commands:
+List the available prompt profiles:
+
+```bash
+python3 scripts/generation_pipeline.py --list-profiles
+```
+
+Preview the planned jobs without running generation:
 
 ```bash
 python3 scripts/generation_pipeline.py --dry-run
 ```
 
-Run the default batch against both checkpoints:
+Run the default batch across `epoch_02` and `epoch_04`:
 
 ```bash
 python3 scripts/generation_pipeline.py
 ```
 
-Run only selected profiles:
+Run a narrower comparison:
 
 ```bash
 python3 scripts/generation_pipeline.py \
@@ -67,66 +92,53 @@ Use your own seed MIDI instead of the built-in validation prompts:
 
 ```bash
 python3 scripts/generation_pipeline.py \
-  --epochs 2,4 \
+  --epochs 4 \
   --profiles schubert_lyrical \
   --prompt-midi /absolute/path/to/seed.mid
 ```
 
-The pipeline writes a manifest JSON into `exports/pipeline_runs/...` and calls `scripts/generate_piano_sample.py` once per checkpoint/profile pair. Each run emits:
+Each pipeline run writes:
 
 - a prompt MIDI snapshot
-- a generated MIDI sample
-- a token `.npy`
-- a metadata `.json`
-- a run summary JSON
+- generated MIDI outputs
+- token arrays
+- metadata JSON files
+- a `pipeline_manifest.json` summary
 
 ## Prompt Guidance
 
-This model is not text-conditioned. The "prompt" you give it is a short MIDI or token prefix. The easiest way to steer it is to create a small seed MIDI with the musical behavior you want and pass it with `--prompt-midi`.
+This model is prompt-conditioned by MIDI or token prefixes, not by natural language. The practical way to steer it is to pass a short seed MIDI with the musical behavior you want.
 
-Good prompt seeds usually have these properties:
+Good prompt seeds are usually:
 
 - one piano track
-- 4 to 16 bars
-- a clear rhythmic pulse
-- moderate note density
-- a strong left-hand pattern or harmonic motion
-- no huge pitch jumps outside normal piano writing
+- 4 to 16 bars long
+- rhythmically clear
+- moderately dense
+- harmonically obvious
+- comfortably inside the normal piano range
 
-Useful prompt ideas to turn into a short seed MIDI:
+Prompt ideas that work well as hand-made seed MIDIs:
 
-- a lyrical Schubert-like opening in A minor with broken left-hand chords
-- a compact recital texture with repeated left-hand figures and a singing right hand
-- a brighter major-key arpeggiated opening with a simple cadence
-- a dramatic low-register ostinato that leaves room for the model to build upward
+- a lyrical A minor opening with broken left-hand chords
+- a compact recital texture with repeated bass figures
+- a brighter major-key arpeggiated opening
+- a low-register ostinato with open space above it
 
-The built-in prompt profiles in `configs/generation_prompt_profiles.json` are based on prompt indices that already produced decent heuristic scores in the saved search outputs under `exports/generated`.
+## GitHub-Ready Pieces
 
-## Upstream Context
+This repository now includes:
 
-This project is best described as being in the same symbolic-music transformer family as MMM, but it is not a literal implementation of the MMM tokenizer. The current 12k run uses Miditok's REMI tokenizer, not MMM. I documented it that way deliberately so the repo does not claim the wrong upstream lineage.
+- `.gitignore` rules that keep data, checkpoints, exports, logs, and vendored binaries out of version control
+- a plain MIT `LICENSE`
+- a lightweight CI workflow that runs the unit tests
+- a GitHub Pages workflow plus a static site in `docs/`
+- a `Makefile` for common commands
+- a `CONTRIBUTING.md` checklist for local review and first upload
 
-The closest upstream references I found are:
+The top-level scripts also now resolve the repository root from the checkout itself instead of assuming the repo lives at `~/gpt2-piano-mps-12k`.
 
-- Jeff Ens and Philippe Pasquier, "MMM: Exploring Conditional Multi-Track Music Generation with the Transformer" (arXiv, August 13, 2020): <https://arxiv.org/abs/2008.06048>
-- MidiTok documentation for MMM and REMI tokenizations: <https://miditok.readthedocs.io/en/latest/tokenizations.html>
-- Google Magenta's MAESTRO dataset page, which is relevant for the MAESTRO-derived filenames and the isolated MAESTRO experiment in this repo: <https://magenta.tensorflow.org/datasets/maestro>
-
-Important note: I did not find a primary source showing MMM as an MIT model. The primary sources above point to the MMM paper by Jeff Ens and Philippe Pasquier and to MidiTok's implementation notes.
-
-## How To Use The Repo
-
-Typical local workflow:
-
-```bash
-python3 scripts/prepare_12k_split.py
-python3 scripts/augment_train_transpose.py
-python3 scripts/tokenize_12k_augmented.py
-python3 scripts/train_gpt2_piano_12k.py
-python3 scripts/generation_pipeline.py
-```
-
-All top-level scripts now resolve the repository root from the checkout itself. If you want to override that location, set:
+If you need to override the detected path, set:
 
 ```bash
 export GPT2_PIANO_ROOT=/absolute/path/to/gpt2-piano-mps-12k
@@ -134,7 +146,7 @@ export GPT2_PIANO_ROOT=/absolute/path/to/gpt2-piano-mps-12k
 
 ## Tests
 
-The unit tests use only Python's standard library so they can run even before the heavy ML stack is installed:
+The test suite uses only the Python standard library:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
@@ -142,30 +154,44 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 
 ## Git Hygiene
 
-This repo previously tracked large local artifacts, including token dumps, checkpoints, generated samples, logs, ONNX exports, and a vendored ONNX dependency tree. The new `.gitignore` keeps those out of Git so the code and documentation stay lightweight.
+Large local assets are intentionally excluded from Git:
 
-The intended tracked content is the source code, prompt-profile config, tests, and documentation. Large local assets should stay local.
+- `data/`
+- `artifacts/`
+- `checkpoints/`
+- `exports/`
+- `logs/`
+- `.onnx_export_vendor/`
 
-One important caveat: if you keep the existing Git history, the old large blobs are still in history even after removing them from the current index. In this working copy, `git count-objects -vH` still reports a packed history around 2.29 GiB. For a truly slim public repo, either:
+That makes future commits small, but it does not erase the old history that already exists in this repository. In this working copy, `git count-objects -vH` still reports a packed history of about `2.29 GiB`.
 
-1. start a fresh repository from the current working tree, or
-2. rewrite history with a tool such as `git filter-repo` before pushing
+If this is going to a brand new GitHub repository, the cleanest upload path is usually a fresh initial commit from the current working tree. The alternative is to rewrite history before pushing.
 
-If this folder is meant to become a brand new remote repository, the cleanest path is usually a fresh initial commit from the current tree.
+## Push To GitHub
 
-## Further Work
+Once `origin` is configured, the minimal check-and-push flow is:
 
-Useful next steps from here:
+```bash
+git remote -v
+git push -u origin main
+```
 
-- add a reproducible environment file for the ML stack
-- add a small prompt-library folder with curated seed MIDIs
-- compare REMI against MMM or TSD tokenization for this piano setup
-- add automatic evaluation beyond the current heuristic score
-- export only selected checkpoints instead of the whole training history
-- add a thin UI around the generation pipeline for interactive prompt auditioning
+`git remote -v` lets you confirm that `origin` points at the GitHub repository you expect before pushing.
+
+## Upstream Context
+
+This project lives in the same symbolic-music transformer lineage as MMM, but it is not an MMM tokenizer implementation. The 12k run in this folder uses Miditok REMI rather than MMM.
+
+Primary-source references:
+
+- Jeff Ens and Philippe Pasquier, "MMM: Exploring Conditional Multi-Track Music Generation with the Transformer" (arXiv, August 13, 2020): <https://arxiv.org/abs/2008.06048>
+- MidiTok tokenization reference: <https://miditok.readthedocs.io/en/latest/tokenizations.html>
+- Google Magenta MAESTRO dataset page: <https://magenta.tensorflow.org/datasets/maestro>
+
+A primary-source search did not turn up evidence that MMM is an MIT model, so this README avoids making that claim.
 
 ## License
 
-The code and documentation in this repository are released under the MIT License in `LICENSE`.
+The code and documentation are released under the MIT License in `LICENSE`.
 
-Model checkpoints, generated outputs, and datasets may have separate licensing constraints. In particular, MAESTRO is published by Google under CC BY-NC-SA 4.0, so do not assume the repository-level MIT license automatically applies to the training data or derived assets.
+Datasets, checkpoints, and generated assets may carry separate licensing constraints. MAESTRO, for example, is published by Google under CC BY-NC-SA 4.0.

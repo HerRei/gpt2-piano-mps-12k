@@ -4,8 +4,10 @@ from pathlib import Path
 from scripts.pipeline_utils import (
     build_generation_command,
     checkpoint_dir,
+    format_profile_listing,
     load_prompt_profiles,
     normalize_epoch,
+    select_profile_names,
 )
 
 
@@ -25,6 +27,18 @@ class PipelineUtilsTests(unittest.TestCase):
         profiles = load_prompt_profiles(ROOT / "configs" / "generation_prompt_profiles.json")
         self.assertIn("schubert_lyrical", profiles)
         self.assertEqual(profiles["schubert_lyrical"].prompt_index, 1)
+
+    def test_select_profile_names(self):
+        available = ["a", "b", "c"]
+        self.assertEqual(select_profile_names(None, available), available)
+        self.assertEqual(select_profile_names("all", available), available)
+        self.assertEqual(select_profile_names("a,c", available), ["a", "c"])
+
+    def test_format_profile_listing(self):
+        profiles = load_prompt_profiles(ROOT / "configs" / "generation_prompt_profiles.json")
+        listing = format_profile_listing(profiles)
+        self.assertIn("Available prompt profiles:", listing)
+        self.assertIn("schubert_lyrical", listing)
 
     def test_build_generation_command_with_profile_prompt(self):
         profiles = load_prompt_profiles(ROOT / "configs" / "generation_prompt_profiles.json")
