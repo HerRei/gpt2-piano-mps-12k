@@ -9,6 +9,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import timedelta
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import torch
@@ -58,18 +59,18 @@ class RunPaths:
 
 @dataclass
 class ResumeInfo:
-    checkpoint: Path | None
+    checkpoint: Optional[Path]
     start_epoch: int = 1
     elapsed: float = 0.0
     best_val: float = field(default_factory=lambda: float("inf"))
-    verification: dict | None = None
+    verification: Optional[dict] = None
     note: dict = field(
         default_factory=lambda: {
             "mode": "fresh_start",
             "message": "starting from scratch",
         }
     )
-    trainer_state: dict | None = None
+    trainer_state: Optional[dict] = None
 
 
 @dataclass
@@ -241,7 +242,7 @@ def set_random_seed(seed: int):
     np.random.seed(seed)
 
 
-def resolve_resume_path(args) -> Path | None:
+def resolve_resume_path(args) -> Optional[Path]:
     if args.train_from_scratch:
         return None
 
@@ -379,7 +380,7 @@ def run_config(args, vocab_size: int) -> dict:
     }
 
 
-def check_resume_args(saved: dict | None, current: dict):
+def check_resume_args(saved: Optional[dict], current: dict):
     if not saved:
         return
 
@@ -418,7 +419,7 @@ def capture_rng_state() -> dict:
     return state
 
 
-def restore_rng_state(state: dict | None):
+def restore_rng_state(state: Optional[dict]):
     if not state:
         return
 
@@ -444,7 +445,7 @@ def load_torch_payload(path: Path) -> dict:
         return torch.load(path, map_location="cpu")
 
 
-def load_trainer_state(checkpoint: Path) -> dict | None:
+def load_trainer_state(checkpoint: Path) -> Optional[dict]:
     path = trainer_state_path(checkpoint)
     if not path.exists():
         return None
@@ -1044,7 +1045,7 @@ def write_finished(status_path: Path, *, total_time: float, global_step: int, be
     )
 
 
-def write_interrupted(status_path: Path, *, epoch: int | None, global_step: int, total_elapsed: float):
+def write_interrupted(status_path: Path, *, epoch: Optional[int], global_step: int, total_elapsed: float):
     write_status(
         status_path,
         {

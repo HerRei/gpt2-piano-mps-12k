@@ -106,59 +106,70 @@ def resolve_output_dir(requested_dir: Optional[Path]) -> Path:
     return (ROOT / "exports" / "pipeline_runs" / timestamp).resolve()
 
 
+def choose_profiles(names: list[str], profiles: dict) -> list:
+    missing = [name for name in names if name not in profiles]
+    if missing:
+        raise KeyError(f"unknown prompt profile: {missing[0]}")
+    return [profiles[name] for name in names]
+
+
+def prompt_sources(args) -> tuple[Optional[Path], Optional[Path]]:
+    midi = args.prompt_midi.expanduser().resolve() if args.prompt_midi else None
+    tokens = args.prompt_tokens.expanduser().resolve() if args.prompt_tokens else None
+    return midi, tokens
+
+
 def build_jobs(args, profiles_file: Path, profiles) -> tuple[list[str], list[PipelineJob], Path]:
-    requested_profile_names = select_profile_names(args.profiles, sorted(profiles))
-    selected_profiles = []
-    for profile_name in requested_profile_names:
-        if profile_name not in profiles:
-            raise KeyError(f"unknown prompt profile: {profile_name}")
-        selected_profiles.append(profiles[profile_name])
+    profile_names = select_profile_names(args.profiles, sorted(profiles))
+    selected = choose_profiles(profile_names, profiles)
+    prompt_midi, prompt_tokens = prompt_sources(args)
 
     epochs = [normalize_epoch(epoch) for epoch in parse_csv(args.epochs)]
     if not epochs:
         raise ValueError("at least one epoch is required")
 
-    output_dir = resolve_output_dir(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    base_dir = resolve_output_dir(args.output_dir)
+    base_dir.mkdir(parents=True, exist_ok=True)
 
     jobs: list[PipelineJob] = []
-    job_counter = 0
+    job_index = 0
+
     for epoch in epochs:
         checkpoint = checkpoint_dir(ROOT, epoch)
         if not checkpoint.exists():
             raise FileNotFoundError(f"checkpoint not found: {checkpoint}")
 
-        epoch_output_dir = output_dir / f"epoch_{epoch:02d}"
-        epoch_output_dir.mkdir(parents=True, exist_ok=True)
+        out_dir = base_dir / f"epoch_{epoch:02d}"
+        out_dir.mkdir(parents=True, exist_ok=True)
 
-        for profile in selected_profiles:
-            job_counter += 1
-            seed = args.seed_base + profile.seed_offset + job_counter
+        for profile in selected:
+            job_index += 1
+            seed = args.seed_base + profile.seed_offset + job_index
             run_name = f"epoch{epoch:02d}_{profile.name}"
             command = build_generation_command(
                 python_bin=args.python_bin,
                 root=ROOT,
                 checkpoint=checkpoint,
-                output_dir=epoch_output_dir,
+                output_dir=out_dir,
                 run_name=run_name,
                 profile=profile,
                 seed=seed,
-                prompt_midi=args.prompt_midi.expanduser().resolve() if args.prompt_midi else None,
-                prompt_tokens=args.prompt_tokens.expanduser().resolve() if args.prompt_tokens else None,
+                prompt_midi=prompt_midi,
+                prompt_tokens=prompt_tokens,
                 num_candidates_override=args.num_candidates,
             )
             jobs.append(
                 PipelineJob(
                     epoch=epoch,
                     checkpoint=checkpoint,
-                    output_dir=epoch_output_dir,
+                    output_dir=out_dir,
                     profile=profile,
                     seed=seed,
                     command=command,
                 )
             )
 
-    return requested_profile_names, jobs, output_dir
+    return profile_names, jobs, base_dir
 
 
 def build_manifest(args, profiles_file: Path, profile_names: list[str], jobs: list[PipelineJob]) -> dict:
@@ -173,9 +184,8 @@ def build_manifest(args, profiles_file: Path, profile_names: list[str], jobs: li
     }
 
 
-def print_job_plan(jobs: list[PipelineJob], dry_run: bool) -> None:
-    mode = "dry run" if dry_run else "execution"
-    print(f"Pipeline mode: {mode}", flush=True)
+def show_jobs(jobs: list[PipelineJob], dry_run: bool) -> None:
+    print(f"Pipeline mode: {'dry run' if dry_run else 'execution'}", flush=True)
     print(f"Jobs queued: {len(jobs)}", flush=True)
     for job in jobs:
         print(
@@ -183,6 +193,10 @@ def print_job_plan(jobs: list[PipelineJob], dry_run: bool) -> None:
             f"output={job.output_dir}",
             flush=True,
         )
+
+
+def write_manifest(path: Path, manifest: dict) -> None:
+    path.write_text(json.dumps(manifest, indent=2))
 
 
 def main():
@@ -198,12 +212,12 @@ def main():
         print(format_profile_listing(profiles))
         return
 
-    requested_profile_names, jobs, output_dir = build_jobs(args, profiles_file, profiles)
-    manifest = build_manifest(args, profiles_file, requested_profile_names, jobs)
-    print_job_plan(jobs, dry_run=args.dry_run)
+    profile_names, jobs, out_dir = build_jobs(args, profiles_file, profiles)
+    manifest = build_manifest(args, profiles_file, profile_names, jobs)
+    show_jobs(jobs, dry_run=args.dry_run)
 
-    manifest_path = output_dir / "pipeline_manifest.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2))
+    manifest_path = out_dir / "pipeline_manifest.json"
+    write_manifest(manifest_path, manifest)
 
     for index, job in enumerate(jobs):
         print(" ".join(shlex.quote(part) for part in job.command), flush=True)
@@ -213,9 +227,9 @@ def main():
 
         subprocess.run(job.command, cwd=ROOT, check=True)
         manifest["jobs"][index]["status"] = "completed"
-        manifest_path.write_text(json.dumps(manifest, indent=2))
+        write_manifest(manifest_path, manifest)
 
-    manifest_path.write_text(json.dumps(manifest, indent=2))
+    write_manifest(manifest_path, manifest)
     print(f"manifest: {manifest_path}", flush=True)
 
 
