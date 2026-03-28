@@ -1,0 +1,53 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+.env
+
+# Local dependency/vendor drops
+/.onnx_export_vendor/
+
+# Large local training and generation artifacts
+/artifacts/*
+!/artifacts/.gitkeep
+/checkpoints/*
+!/checkpoints/.gitkeep
+/data/raw/*
+!/data/raw/.gitkeep
+/data/splits/*
+!/data/splits/.gitkeep
+/data/augmented/*
+!/data/augmented/.gitkeep
+/exports/*
+!/exports/.gitkeep
+/logs/*
+!/logs/.gitkeep
+
+# Experiment-local outputs
+/experiments/**/artifacts/*
+!/experiments/**/artifacts/.gitkeep
+/experiments/**/checkpoints/*
+!/experiments/**/checkpoints/.gitkeep
+/experiments/**/exports/*
+!/experiments/**/exports/.gitkeep
+/experiments/**/logs/*
+!/experiments/**/logs/.gitkeep
+/experiments/**/scripts/__pycache__/
+
+# Binary/model outputs
+*.mid
+*.midi
+*.npy
+*.npz
+*.onnx
+*.safetensors
+*.log

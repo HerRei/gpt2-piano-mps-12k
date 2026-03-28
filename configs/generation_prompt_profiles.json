@@ -1,0 +1,50 @@
+{
+  "schubert_lyrical": {
+    "description": "Validation prompt 1, middle slice, polished preset. Based on one of the strongest saved prompt-search results.",
+    "prompt_split": "validation",
+    "prompt_index": 1,
+    "prompt_position": "middle",
+    "prompt_length": 768,
+    "max_new_tokens": 640,
+    "preset": "polished",
+    "num_candidates": 2,
+    "cpu_threads": 2,
+    "seed_offset": 0
+  },
+  "recital_compact": {
+    "description": "Validation prompt 2, middle slice, polished preset. Tighter continuation behavior from a shorter source performance.",
+    "prompt_split": "validation",
+    "prompt_index": 2,
+    "prompt_position": "middle",
+    "prompt_length": 768,
+    "max_new_tokens": 640,
+    "preset": "polished",
+    "num_candidates": 2,
+    "cpu_threads": 2,
+    "seed_offset": 100
+  },
+  "schubert_bright": {
+    "description": "Validation prompt 14, middle slice, polished preset. Broader pitch span and brighter continuation candidates.",
+    "prompt_split": "validation",
+    "prompt_index": 14,
+    "prompt_position": "middle",
+    "prompt_length": 768,
+    "max_new_tokens": 640,
+    "preset": "polished",
+    "num_candidates": 2,
+    "cpu_threads": 2,
+    "seed_offset": 200
+  },
+  "recital_expansive": {
+    "description": "Validation prompt 23, middle slice, polished preset. Useful when you want a more spacious recital-style seed.",
+    "prompt_split": "validation",
+    "prompt_index": 23,
+    "prompt_position": "middle",
+    "prompt_length": 768,
+    "max_new_tokens": 640,
+    "preset": "polished",
+    "num_candidates": 2,
+    "cpu_threads": 2,
+    "seed_offset": 300
+  }
+}
