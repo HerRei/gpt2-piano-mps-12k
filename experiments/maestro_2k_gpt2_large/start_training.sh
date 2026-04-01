@@ -2,14 +2,23 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
-PYTHON_BIN=${PYTHON_BIN:-/opt/homebrew/anaconda3/envs/gpt2piano/bin/python}
-MAESTRO_SOURCE_ROOT=${MAESTRO_SOURCE_ROOT:-/Users/hermesreisner/gpt2-piano-mps-12k/data/raw/maestro-v3.0.0}
+WORKSPACE_ROOT=$(cd -- "$SCRIPT_DIR/../.." && pwd)
+PYTHON_BIN=${PYTHON_BIN:-python3}
+MAESTRO_SOURCE_ROOT=${MAESTRO_SOURCE_ROOT:-$WORKSPACE_ROOT/data/raw/maestro-v3.0.0}
 FORCE_REBUILD=${FORCE_REBUILD:-0}
 TRAIN_ARGS=${TRAIN_ARGS:-}
 
-if [[ ! -x "$PYTHON_BIN" ]]; then
-  echo "python interpreter not found: $PYTHON_BIN" >&2
-  exit 1
+if [[ "$PYTHON_BIN" == */* ]]; then
+  if [[ ! -x "$PYTHON_BIN" ]]; then
+    echo "python interpreter not found: $PYTHON_BIN" >&2
+    exit 1
+  fi
+else
+  if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+    echo "python interpreter not found on PATH: $PYTHON_BIN" >&2
+    exit 1
+  fi
+  PYTHON_BIN=$(command -v "$PYTHON_BIN")
 fi
 
 if [[ ! -d "$MAESTRO_SOURCE_ROOT" ]]; then

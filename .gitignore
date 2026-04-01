@@ -41,6 +41,15 @@ env/
 !/experiments/**/exports/.gitkeep
 /experiments/**/logs/*
 !/experiments/**/logs/.gitkeep
+/experiments/**/runs/*/artifacts/*
+!/experiments/**/runs/*/artifacts/.gitkeep
+/experiments/**/runs/*/checkpoints/*
+!/experiments/**/runs/*/checkpoints/.gitkeep
+/experiments/**/runs/*/exports/*
+!/experiments/**/runs/*/exports/.gitkeep
+/experiments/**/runs/*/logs/*
+!/experiments/**/runs/*/logs/.gitkeep
+/experiments/**/runs/*/run_preset.json
 /experiments/**/scripts/__pycache__/
 
 # Binary/model outputs
@@ -53,3 +62,4 @@ env/
 *.log
 
 !examples/*.mid
+examples/Project.band/

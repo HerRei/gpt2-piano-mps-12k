@@ -6,7 +6,7 @@ Notes:
 - This uses the standard GPT-2 Large shape: `n_layer=36`, `n_head=20`, `n_embd=1280`.
 - Because this project's vocab is tiny compared to text GPT-2, the actual parameter count is lower than the published 774M GPT-2 Large number, but it is still in that model class.
 - Outputs stay inside this folder: `data`, `artifacts`, `checkpoints`, and `logs`.
-- The default MAESTRO source location is `/Users/hermesreisner/gpt2-piano-mps-12k/data/raw/maestro-v3.0.0`.
+- The default MAESTRO source location is `data/raw/maestro-v3.0.0` at the repo root.
 - If MAESTRO metadata CSV is present, the subset keeps the canonical split proportions. Otherwise it falls back to a seeded random split.
 
 One-command start:
@@ -22,7 +22,7 @@ MAESTRO_SOURCE_ROOT=/path/to/maestro-v3.0.0 zsh experiments/maestro_2k_gpt2_larg
 ```
 
 Useful env overrides:
-- `PYTHON_BIN`: Python interpreter to use. Default is `/opt/homebrew/anaconda3/envs/gpt2piano/bin/python`
+- `PYTHON_BIN`: Python interpreter to use. Default is the active `python3`
 - `FORCE_REBUILD=1`: rebuild split and token artifacts even if they already exist
 - `TRAIN_ARGS="..."`: extra args passed to the training script
 

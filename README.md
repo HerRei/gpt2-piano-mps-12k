@@ -1,6 +1,6 @@
 # GPT-2 Piano MPS 12k
 
-This is the 12k piano run I used for training and checkpoint comparison on Apple Silicon.
+This repo holds the 12k piano run I used for training and checkpoint comparison on Apple Silicon.
 
 The setup is simple:
 
@@ -10,7 +10,7 @@ The setup is simple:
 4. train a 12-layer GPT-2 style model on 2048-token windows
 5. compare checkpoints by generating continuations from short piano prompts
 
-Training runs on MPS. Generation runs on CPU so it does not fight the training job for the same device.
+Training runs on MPS. Generation is usually easier on CPU so it does not compete with a live training run for the same device.
 
 ## Quick start
 
@@ -41,6 +41,7 @@ make pipeline-dry-run
 - `scripts/generation_pipeline.py`: run a small batch over multiple checkpoints and prompt presets
 - `configs/generation_prompt_profiles.json`: prompt presets used by the batch script
 - `examples/generated-example.mid`: one tracked sample output
+- `experiments/melody_intensity_editor`: a smaller side experiment for melody-conditioned intensity control built on top of this workflow
 
 Model shape for the current run:
 
@@ -115,13 +116,40 @@ Each run writes the prompt snapshot, generated MIDI files, token arrays, metadat
 
 This model is prompt-conditioned by MIDI or token prefixes, not by text. In practice the best prompts are short, clear piano snippets: one track, a few bars, obvious rhythm, and a stable texture.
 
-## Example
+## Examples
 
 Tracked sample MIDI:
 
-- [examples/generated-example.mid](/Users/hermesreisner/gpt2-piano-mps-12k/examples/generated-example.mid)
+- [examples/generated-example.mid](examples/generated-example.mid)
 
-That file is a balanced-preset continuation chosen from a wider search on `checkpoints/best`. Its saved heuristic score is `4.999121`.
+That file is a balanced-preset continuation chosen from a wider search on `checkpoints/best`.
+
+GarageBand demo:
+
+- [examples/AAA-Best.band](examples/AAA-Best.band)
+
+That bundle is a simple GarageBand arrangement built from one of the generated results. It is useful if you want to hear the output inside a fuller session instead of opening a raw MIDI file by itself.
+
+If you want to reshape a phrase from that material instead of just continuing it, you can lift a short passage or an extracted melody from the arrangement and run it through the melody-intensity experiment in [experiments/melody_intensity_editor](experiments/melody_intensity_editor).
+
+## Side Experiment
+
+This repo also includes a smaller downstream experiment in [experiments/melody_intensity_editor](experiments/melody_intensity_editor). It reuses the 12k augmented piano corpus and reframes the task as:
+
+- input: a short melody or piano phrase
+- control: a scalar intensity value from `0.0` to `1.0`
+- output: a newly rendered piano phrase intended to sound softer/sparser or louder/denser
+
+It is still phrase-level and experimental. It is useful for controllable symbolic-MIDI prototyping, but it is not a true note-preserving live editor.
+
+Useful entry points:
+
+```bash
+zsh experiments/melody_intensity_editor/run_live_demo.sh --list
+caffeinate -dimsu zsh experiments/melody_intensity_editor/start_training_v2_improved.sh
+```
+
+See [experiments/melody_intensity_editor/README.md](experiments/melody_intensity_editor/README.md) for the workflow, caveats, and demo commands.
 
 ## Tests
 

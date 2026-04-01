@@ -1,0 +1,54 @@
+{
+  "default_demo": "chopin_nocturne_op9_no2",
+  "maestro_root_hint": "Set MAESTRO_ROOT or pass --maestro-root to point at your local maestro-v3.0.0 folder.",
+  "demos": {
+    "chopin_nocturne_op9_no2": {
+      "composer": "Frederic Chopin",
+      "title": "Nocturne Op. 9 No. 2 in E-flat Major",
+      "description": "Lyrical and spacious. Good first demo for hearing whether the model can keep a singing melody while changing intensity.",
+      "maestro_relpath": "2011/MIDI-Unprocessed_06_R3_2011_MID--AUDIO_R3-D3_05_Track05_wav.midi",
+      "extract_melody": true,
+      "window_beats": 16,
+      "hop_beats": 16,
+      "schedule_mode": "step",
+      "intensity_schedule": "0:0.20,16:0.75,32:0.45,48:0.85",
+      "suggested_name": "demo_chopin_nocturne"
+    },
+    "beethoven_tempest_i": {
+      "composer": "Ludwig van Beethoven",
+      "title": "Sonata No. 17 in D Minor, Op. 31 No. 2, First Movement",
+      "description": "More dramatic and rhythmically charged. Good stress test for whether the edit remains coherent when intensity changes sharply.",
+      "maestro_relpath": "2017/MIDI-Unprocessed_050_PIANO050_MID--AUDIO-split_07-06-17_Piano-e_3-01_wav--2.midi",
+      "extract_melody": true,
+      "window_beats": 16,
+      "hop_beats": 16,
+      "schedule_mode": "step",
+      "intensity_schedule": "0:0.30,16:0.90,32:0.55,48:1.00",
+      "suggested_name": "demo_beethoven_tempest"
+    },
+    "mozart_k330_i": {
+      "composer": "Wolfgang Amadeus Mozart",
+      "title": "Sonata in C Major, K. 330, I. Allegro moderato",
+      "description": "Clean classical phrasing with less pedal density. Useful for hearing articulation changes under different intensity levels.",
+      "maestro_relpath": "2015/MIDI-Unprocessed_R1_D2-13-20_mid--AUDIO-from_mp3_20_R1_2015_wav--2.midi",
+      "extract_melody": true,
+      "window_beats": 16,
+      "hop_beats": 16,
+      "schedule_mode": "step",
+      "intensity_schedule": "0:0.35,16:0.65,32:0.25,48:0.80",
+      "suggested_name": "demo_mozart_k330"
+    },
+    "grieg_waltz_op12_no2": {
+      "composer": "Edvard Grieg",
+      "title": "Lyric Piece in A Minor, Waltz, Op. 12 No. 2",
+      "description": "Short and compact. Good fastest smoke test when you want to check the whole pipeline quickly.",
+      "maestro_relpath": "2014/MIDI-UNPROCESSED_21-22_R1_2014_MID--AUDIO_21_R1_2014_wav--1.midi",
+      "extract_melody": true,
+      "window_beats": 16,
+      "hop_beats": 16,
+      "schedule_mode": "step",
+      "intensity_schedule": "0:0.25,16:0.85",
+      "suggested_name": "demo_grieg_waltz"
+    }
+  }
+}

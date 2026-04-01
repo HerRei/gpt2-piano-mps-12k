@@ -1,0 +1,24 @@
+{
+  "name": "v2_improved",
+  "goal": "Slightly deeper melody-intensity run with denser phrase coverage.",
+  "run_root": "runs/v2_improved_m16_overlap_e6",
+  "dataset_args": [
+    "--step-beats", "8",
+    "--max-windows-per-file", "8"
+  ],
+  "train_args": [
+    "--epochs", "6",
+    "--n-layer", "16",
+    "--n-head", "12",
+    "--n-embd", "768",
+    "--lr", "0.00012",
+    "--warmup-steps", "800",
+    "--log-every-opt-steps", "10"
+  ],
+  "notes": [
+    "Same width and head count as v1, but deeper.",
+    "Phrase windows overlap by 50 percent.",
+    "Outputs stay in a separate run root.",
+    "The launcher resumes from checkpoints/latest when available."
+  ]
+}
