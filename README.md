@@ -1,5 +1,7 @@
 # GPT-2 Piano MPS 12k
 
+Showcase: <https://herrei.github.io/gpt2-piano-mps-12k/>
+
 This repo holds the 12k piano run I used for training and checkpoint comparison on Apple Silicon.
 
 The setup is simple:
@@ -180,7 +182,6 @@ Large local outputs stay out of Git:
 - `exports/`
 - `logs/`
 - `.onnx_export_vendor/`
-
 
 Minimal push flow:
 
