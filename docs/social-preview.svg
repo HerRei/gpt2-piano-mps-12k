@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">GPT-2 Piano MPS 12k</title>
+  <desc id="desc">Social preview image for a symbolic piano MIDI continuation project.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151411"/>
+      <stop offset="1" stop-color="#0d0c0b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#85b8ff"/>
+      <stop offset="1" stop-color="#e2c36b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="175" cy="90" r="280" fill="#85b8ff" opacity="0.08"/>
+
+  <g transform="translate(88 94)">
+    <rect width="34" height="34" rx="7" fill="url(#accent)"/>
+    <path d="M12 0v34M22 0v34" stroke="#151411" stroke-width="5" opacity="0.85"/>
+    <text x="0" y="108" fill="#e2c36b" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="2">SYMBOLIC PIANO CONTINUATION</text>
+    <text x="0" y="208" fill="#f3efe7" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="800">GPT-2 Piano</text>
+    <text x="0" y="292" fill="#f3efe7" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="800">MPS 12k</text>
+    <text x="0" y="354" fill="#b9b3a9" font-family="Arial, Helvetica, sans-serif" font-size="28">MIDI prompts -> REMI tokens</text>
+    <text x="0" y="394" fill="#b9b3a9" font-family="Arial, Helvetica, sans-serif" font-size="28">GPT-2 transformer -> MIDI output</text>
+  </g>
+
+  <g transform="translate(730 118)">
+    <rect width="360" height="340" rx="10" fill="#1a1916" stroke="#ffffff" stroke-opacity="0.12"/>
+    <text x="28" y="48" fill="#847f76" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">SHORT PROMPT</text>
+    <text x="210" y="48" fill="#847f76" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">CONTINUATION</text>
+    <rect x="28" y="75" width="304" height="210" rx="7" fill="#151411" stroke="#ffffff" stroke-opacity="0.12"/>
+    <path d="M70 75v210M116 75v210M162 75v210M208 75v210M254 75v210M300 75v210" stroke="#ffffff" stroke-opacity="0.08"/>
+    <path d="M28 127h304M28 179h304M28 231h304" stroke="#ffffff" stroke-opacity="0.08"/>
+    <rect x="92" y="105" width="82" height="18" rx="8" fill="#85b8ff"/>
+    <rect x="118" y="158" width="66" height="18" rx="8" fill="#85b8ff"/>
+    <rect x="162" y="210" width="76" height="18" rx="8" fill="#e2c36b"/>
+    <rect x="226" y="135" width="90" height="18" rx="8" fill="#b9a4ff"/>
+    <rect x="250" y="188" width="96" height="18" rx="8" fill="#e2c36b"/>
+    <rect x="270" y="245" width="70" height="18" rx="8" fill="#85b8ff"/>
+    <line x1="208" y1="75" x2="208" y2="285" stroke="#f3efe7" stroke-opacity="0.55"/>
+    <g fill="#dbe8ff" font-family="Menlo, Consolas, monospace" font-size="16">
+      <rect x="28" y="304" width="68" height="28" rx="6" fill="#85b8ff" opacity="0.13" stroke="#85b8ff" stroke-opacity="0.25"/>
+      <text x="40" y="324">Bar_4</text>
+      <rect x="106" y="304" width="108" height="28" rx="6" fill="#85b8ff" opacity="0.13" stroke="#85b8ff" stroke-opacity="0.25"/>
+      <text x="118" y="324">Pitch_64</text>
+      <rect x="224" y="304" width="108" height="28" rx="6" fill="#85b8ff" opacity="0.13" stroke="#85b8ff" stroke-opacity="0.25"/>
+      <text x="236" y="324">Duration</text>
+    </g>
+  </g>
+</svg>

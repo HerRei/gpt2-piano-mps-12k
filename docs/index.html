@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A clean GitHub Pages showcase for GPT-2 Piano MPS 12k, a symbolic MIDI piano continuation project trained on Apple Silicon.">
+    <meta name="author" content="HerRei">
+    <meta name="theme-color" content="#12110f">
+    <meta property="og:title" content="GPT-2 Piano MPS 12k">
+    <meta property="og:description" content="A symbolic GPT-2-style piano MIDI continuation project trained with PyTorch on Apple Silicon MPS.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://herrei.github.io/gpt2-piano-mps-12k/">
+    <meta property="og:image" content="https://herrei.github.io/gpt2-piano-mps-12k/social-preview.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GPT-2 Piano MPS 12k">
+    <meta name="twitter:description" content="Symbolic piano MIDI continuation with a GPT-2-style model, Miditok REMI, PyTorch, and Apple Silicon MPS.">
+    <meta name="twitter:image" content="https://herrei.github.io/gpt2-piano-mps-12k/social-preview.png">
+    <title>GPT-2 Piano MPS 12k</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="#top" aria-label="GPT-2 Piano MPS 12k home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          GPT-2 Piano MPS 12k
+        </a>
+        <div class="nav-links">
+          <a href="#overview">Overview</a>
+          <a href="#pipeline">Pipeline</a>
+          <a href="#model">Model</a>
+          <a href="#checkpoints">Compare</a>
+          <a href="#run-local">Run</a>
+          <a href="#demo">Demo</a>
+          <a href="#side-experiment">Experiment</a>
+          <a href="https://github.com/HerRei/gpt2-piano-mps-12k" rel="noreferrer">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero section" id="top" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Symbolic piano continuation</p>
+          <h1 id="hero-title">GPT-2 Piano Generation on Apple Silicon</h1>
+          <p class="hero-subtitle">
+            A small machine-learning music project that trains a GPT-2-style model to continue symbolic piano MIDI.
+          </p>
+          <div class="button-row">
+            <a class="button primary" href="#demo">View Demo</a>
+            <a class="button secondary" href="https://github.com/HerRei/gpt2-piano-mps-12k" rel="noreferrer">View GitHub</a>
+            <a class="button ghost" href="#pipeline">See Pipeline</a>
+          </div>
+          <ul class="tag-list">
+            <li>PyTorch</li>
+            <li>MIDI</li>
+            <li>GPT-2</li>
+            <li>Miditok</li>
+            <li>Apple Silicon</li>
+          </ul>
+        </div>
+
+        <aside class="roll-card" aria-label="Symbolic MIDI continuation visualization">
+          <div class="roll-card-header">
+            <span>short prompt</span>
+            <span>generated continuation</span>
+          </div>
+          <div class="piano-roll" aria-hidden="true">
+            <div class="keys">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="roll-grid">
+              <span class="note blue n1"></span>
+              <span class="note blue n2"></span>
+              <span class="note gold n3"></span>
+              <span class="note blue n4"></span>
+              <span class="note violet n5"></span>
+              <span class="note gold n6"></span>
+              <span class="note blue n7"></span>
+              <span class="note violet n8"></span>
+              <span class="note gold n9"></span>
+              <span class="playhead"></span>
+            </div>
+          </div>
+          <div class="token-strip" aria-hidden="true">
+            <span>Bar_4</span>
+            <span>Position_8</span>
+            <span>Pitch_64</span>
+            <span>Velocity_75</span>
+            <span>Duration_1.0</span>
+            <span>Pitch_67</span>
+          </div>
+          <p class="visual-caption">MIDI notes are converted into REMI event tokens before the model predicts the continuation.</p>
+        </aside>
+      </section>
+
+      <section class="section overview" id="overview" aria-labelledby="overview-title">
+        <div class="section-heading">
+          <p class="eyebrow">Overview</p>
+          <h2 id="overview-title">What this project is</h2>
+        </div>
+        <div class="overview-grid">
+          <article class="text-card">
+            <h3>A GPT-2-style piano model</h3>
+            <p>
+              GPT-2 Piano MPS 12k is a symbolic music generator. Instead of natural-language prompts,
+              it reads short piano MIDI prompts, turns them into token sequences, and generates a continuation.
+            </p>
+          </article>
+          <article class="text-card">
+            <h3>Built as a training workflow</h3>
+            <p>
+              The repo includes scripts for splitting MIDI data, augmenting training files, tokenizing with
+              Miditok REMI, training the model, generating samples, and comparing checkpoints.
+            </p>
+          </article>
+          <article class="text-card">
+            <h3>Designed for a local machine</h3>
+            <p>
+              Training targets Apple Silicon MPS. Large artifacts such as datasets and checkpoints stay local,
+              so the public repo keeps the code and one tracked example MIDI.
+            </p>
+          </article>
+        </div>
+
+        <div class="tech-panel">
+          <span>PyTorch</span>
+          <span>Hugging Face Transformers</span>
+          <span>Miditok REMI</span>
+          <span>pretty_midi</span>
+          <span>NumPy</span>
+          <span>Apple Silicon MPS</span>
+        </div>
+
+        <div class="callout">
+          <strong>Not text-to-music</strong>
+          <p>This project does not take written prompts. It continues short MIDI or token prompts, so the input is musical context rather than natural language.</p>
+        </div>
+      </section>
+
+      <section class="section demo" id="demo" aria-labelledby="demo-title">
+        <div class="demo-copy">
+          <p class="eyebrow">Demo</p>
+          <h2 id="demo-title">Demo</h2>
+          <p>
+            The model generates a continuation from a short piano MIDI prompt. This repo includes one tracked
+            sample output at <code>examples/generated-example.mid</code>.
+          </p>
+          <div class="button-row">
+            <a class="button primary" href="https://github.com/HerRei/gpt2-piano-mps-12k/raw/main/examples/generated-example.mid" download="generated-example.mid">Download Sample MIDI</a>
+            <a class="button secondary" href="https://github.com/HerRei/gpt2-piano-mps-12k/blob/main/examples/generated-example.mid" rel="noreferrer">View File</a>
+          </div>
+          <p class="small-note">
+            No MP3 file is included, so this page links to the MIDI directly. Browser MIDI playback may depend
+            on the user's system or installed software.
+          </p>
+        </div>
+        <div class="demo-visual" aria-hidden="true">
+          <div class="demo-file">
+            <span class="demo-file-label">short MIDI prompt</span>
+            <div class="compact-roll prompt-roll">
+              <span class="compact-note c1"></span>
+              <span class="compact-note c2"></span>
+              <span class="compact-note c3"></span>
+              <span class="compact-note c4"></span>
+            </div>
+          </div>
+          <div class="demo-transform">
+            <span>REMI token ids</span>
+            <span>GPT-2 checkpoint</span>
+            <span>sample tokens</span>
+          </div>
+          <div class="demo-file">
+            <span class="demo-file-label">generated-example.mid</span>
+            <div class="compact-roll output-roll">
+              <span class="compact-note c5"></span>
+              <span class="compact-note c6"></span>
+              <span class="compact-note c7"></span>
+              <span class="compact-note c8"></span>
+              <span class="compact-note c9"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section pipeline" id="pipeline" aria-labelledby="pipeline-title">
+        <div class="section-heading">
+          <p class="eyebrow">Pipeline</p>
+          <h2 id="pipeline-title">How it works</h2>
+          <p>
+            The workflow keeps the music symbolic from start to finish: MIDI files become REMI tokens,
+            the transformer learns token continuations, and generated tokens are written back to MIDI.
+          </p>
+        </div>
+
+        <div class="pipeline-grid">
+          <article class="pipeline-card">
+            <span class="step-number">01</span>
+            <h3>Raw MIDI</h3>
+            <p>Start with piano MIDI files stored locally.</p>
+            <code>data/raw/source_midis</code>
+          </article>
+          <article class="pipeline-card">
+            <span class="step-number">02</span>
+            <h3>Split data</h3>
+            <p>Create train, validation, and test splits.</p>
+            <code>prepare_12k_split.py</code>
+          </article>
+          <article class="pipeline-card">
+            <span class="step-number">03</span>
+            <h3>Transpose training files</h3>
+            <p>Add bounded piano transpositions for augmentation.</p>
+            <code>augment_train_transpose.py</code>
+          </article>
+          <article class="pipeline-card">
+            <span class="step-number">04</span>
+            <h3>Tokenize with REMI</h3>
+            <p>Convert MIDI into compact token arrays.</p>
+            <code>tokenize_12k_augmented.py</code>
+          </article>
+          <article class="pipeline-card">
+            <span class="step-number">05</span>
+            <h3>Train GPT-2 model</h3>
+            <p>Train a transformer on 2048-token windows.</p>
+            <code>train_gpt2_piano_12k.py</code>
+          </article>
+          <article class="pipeline-card">
+            <span class="step-number">06</span>
+            <h3>Compare checkpoints</h3>
+            <p>Run prompt profiles over saved epochs.</p>
+            <code>generation_pipeline.py</code>
+          </article>
+          <article class="pipeline-card">
+            <span class="step-number">07</span>
+            <h3>Generate MIDI</h3>
+            <p>Save generated continuations as MIDI files.</p>
+            <code>generate_piano_sample.py</code>
+          </article>
+        </div>
+      </section>
+
+      <section class="section model" id="model" aria-labelledby="model-title">
+        <div class="section-heading">
+          <p class="eyebrow">Model</p>
+          <h2 id="model-title">Model</h2>
+          <p>
+            The current run uses a compact GPT-2-style configuration for symbolic music tokens.
+            It is prompt-conditioned by MIDI or token prefixes, not by text.
+          </p>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <strong>12</strong>
+            <span>layers</span>
+          </article>
+          <article class="stat-card">
+            <strong>12</strong>
+            <span>attention heads</span>
+          </article>
+          <article class="stat-card">
+            <strong>2048</strong>
+            <span>token context</span>
+          </article>
+          <article class="stat-card">
+            <strong>423</strong>
+            <span>token vocabulary</span>
+          </article>
+          <article class="stat-card">
+            <strong>768</strong>
+            <span>embedding size</span>
+          </article>
+          <article class="stat-card">
+            <strong>MPS</strong>
+            <span>Apple Silicon training</span>
+          </article>
+        </div>
+
+        <div class="model-flow">
+          <article class="flow-stage">
+            <h3>MIDI prompt</h3>
+            <div class="flow-roll">
+              <span class="flow-note f1"></span>
+              <span class="flow-note f2"></span>
+              <span class="flow-note f3"></span>
+            </div>
+          </article>
+          <article class="flow-stage">
+            <h3>REMI tokens</h3>
+            <div class="flow-token-list">
+              <span>Bar</span>
+              <span>Position</span>
+              <span>Pitch</span>
+              <span>Velocity</span>
+              <span>Duration</span>
+            </div>
+          </article>
+          <article class="flow-stage transformer-stage">
+            <h3>GPT-2 transformer</h3>
+            <div class="layer-stack">
+              <span>embedding</span>
+              <span>12 layers</span>
+              <span>LM head</span>
+            </div>
+          </article>
+          <article class="flow-stage">
+            <h3>Generated tokens</h3>
+            <div class="flow-token-list generated">
+              <span>Position</span>
+              <span>Pitch</span>
+              <span>Duration</span>
+              <span>Bar</span>
+            </div>
+          </article>
+          <article class="flow-stage">
+            <h3>MIDI output</h3>
+            <div class="flow-roll output">
+              <span class="flow-note f4"></span>
+              <span class="flow-note f5"></span>
+              <span class="flow-note f6"></span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section checkpoints" id="checkpoints" aria-labelledby="checkpoints-title">
+        <div class="section-heading">
+          <p class="eyebrow">Checkpoint comparison</p>
+          <h2 id="checkpoints-title">Comparing saved runs</h2>
+          <p>
+            The repo includes a small batch script for comparing checkpoints by generating MIDI continuations
+            from the same prompt profiles. Checkpoint files are local only and are not included in the repo.
+          </p>
+        </div>
+
+        <div class="comparison-grid">
+          <article class="comparison-card">
+            <span class="step-number">epoch_02</span>
+            <h3>Local best note</h3>
+            <strong>val_loss 1.429826</strong>
+            <p>Saved as <code>checkpoints/best</code> on the local training machine.</p>
+          </article>
+          <article class="comparison-card">
+            <span class="step-number">epoch_04</span>
+            <h3>Later comparison</h3>
+            <strong>val_loss 1.531063</strong>
+            <p>Used for side-by-side continuation checks against the earlier checkpoint.</p>
+          </article>
+          <article class="comparison-card">
+            <span class="step-number">script</span>
+            <h3>Batch generation</h3>
+            <strong>generation_pipeline.py</strong>
+            <p>Writes generated MIDI files, token arrays, metadata JSON, and a pipeline manifest.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section run-local" id="run-local" aria-labelledby="run-local-title">
+        <div class="section-heading">
+          <p class="eyebrow">Local use</p>
+          <h2 id="run-local-title">Run it locally</h2>
+          <p>
+            The code is set up for local experiments. Training and generation need local MIDI data and local checkpoints.
+          </p>
+        </div>
+
+        <div class="run-grid">
+          <article class="command-card">
+            <h3>Smoke check</h3>
+            <pre><code>python3 -m pip install -r requirements-smoke.txt
+python3 -m unittest tests.test_dependency_smoke</code></pre>
+          </article>
+          <article class="command-card">
+            <h3>Training pipeline</h3>
+            <pre><code>python3 scripts/prepare_12k_split.py
+python3 scripts/augment_train_transpose.py
+python3 scripts/tokenize_12k_augmented.py
+python3 scripts/train_gpt2_piano_12k.py --train-from-scratch</code></pre>
+          </article>
+          <article class="command-card">
+            <h3>Generate after training</h3>
+            <pre><code>python3 scripts/generate_piano_sample.py \
+  --checkpoint checkpoints/best</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section class="section side-experiment" id="side-experiment" aria-labelledby="intensity-title">
+        <div class="section-heading">
+          <p class="eyebrow">Side experiment</p>
+          <h2 id="intensity-title">Melody Intensity Editor</h2>
+          <p>
+            This side experiment explores controlling the density and energy of generated phrases with an
+            intensity value from 0.0 to 1.0.
+          </p>
+        </div>
+
+        <div class="intensity-card">
+          <div class="slider-labels">
+            <span>soft / sparse</span>
+            <span id="intensity-value">0.45</span>
+            <span>loud / dense</span>
+          </div>
+          <label class="visually-hidden" for="intensity-range">Melody intensity</label>
+          <input id="intensity-range" type="range" min="0" max="1" step="0.01" value="0.45">
+          <div class="intensity-summary" aria-live="polite">
+            <strong id="intensity-mode">balanced phrase</strong>
+            <span id="intensity-note-count">5 preview notes active</span>
+            <span id="intensity-velocity">velocity target 64 / 127</span>
+          </div>
+          <div class="intensity-layout">
+            <div class="intensity-roll" aria-hidden="true">
+              <span class="intensity-note blue i-note-1" data-min="0"></span>
+              <span class="intensity-note gold i-note-2" data-min="0.08"></span>
+              <span class="intensity-note blue i-note-3" data-min="0.18"></span>
+              <span class="intensity-note violet i-note-4" data-min="0.28"></span>
+              <span class="intensity-note gold i-note-5" data-min="0.38"></span>
+              <span class="intensity-note blue i-note-6" data-min="0.5"></span>
+              <span class="intensity-note violet i-note-7" data-min="0.64"></span>
+              <span class="intensity-note gold i-note-8" data-min="0.78"></span>
+              <span class="intensity-note blue i-note-9" data-min="0.9"></span>
+            </div>
+            <div class="density-preview" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section limitations" aria-labelledby="limitations-title">
+        <div class="section-heading">
+          <p class="eyebrow">Notes</p>
+          <h2 id="limitations-title">Limitations</h2>
+        </div>
+        <div class="limitations-grid">
+          <article class="text-card">
+            <h3>Local artifacts</h3>
+            <p>Datasets and checkpoints are not included in the repo.</p>
+          </article>
+          <article class="text-card">
+            <h3>Prompt sensitivity</h3>
+            <p>Output quality depends on the MIDI prompt and the checkpoint being sampled.</p>
+          </article>
+          <article class="text-card">
+            <h3>MIDI continuation</h3>
+            <p>This is MIDI continuation, not text-to-music generation from written prompts.</p>
+          </article>
+          <article class="text-card">
+            <h3>Experimental control</h3>
+            <p>The Melody Intensity Editor is still a side experiment.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section final-cta" aria-labelledby="final-title">
+        <p class="eyebrow">Next step</p>
+        <h2 id="final-title">Train. Compare. Generate.</h2>
+        <div class="button-row">
+          <a class="button primary" href="https://github.com/HerRei/gpt2-piano-mps-12k" rel="noreferrer">Open GitHub Repository</a>
+          <a class="button secondary" href="https://github.com/HerRei/gpt2-piano-mps-12k/raw/main/examples/generated-example.mid" download="generated-example.mid">Download Sample MIDI</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>GPT-2 Piano MPS 12k · symbolic MIDI generation with PyTorch</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
