@@ -63,3 +63,7 @@ env/
 
 !examples/*.mid
 examples/Project.band/
+
+# Showcase build dependencies
+/node_modules/
+/showcase/node_modules/

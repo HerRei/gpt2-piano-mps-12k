@@ -1,0 +1,5 @@
+# Pages output is generated from showcase/; review the maintained sources there.
+docs/index.html linguist-generated=true
+docs/assets/** linguist-generated=true -whitespace
+docs/licenses/** linguist-vendored=true
+showcase/public/licenses/** linguist-vendored=true
