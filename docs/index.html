@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A clean GitHub Pages showcase for GPT-2 Piano MPS 12k, a symbolic MIDI piano continuation project trained on Apple Silicon.">
+    <meta name="description" content="I’m building live piano music for PhantomHunt. From GPT-2 on a borrowed Mac to RWKV-7 with intensity controls, trained on two AMD GPUs.">
     <meta name="author" content="HerRei">
     <meta name="theme-color" content="#12110f">
-    <meta property="og:title" content="GPT-2 Piano MPS 12k">
-    <meta property="og:description" content="A symbolic GPT-2-style piano MIDI continuation project trained with PyTorch on Apple Silicon MPS.">
+    <meta property="og:title" content="Piano model: from GPT-2 on a Mac to live RWKV-7">
+    <meta property="og:description" content="I’m building live piano music for PhantomHunt. From GPT-2 on a borrowed Mac to RWKV-7 with intensity controls, trained on two AMD GPUs.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://herrei.github.io/gpt2-piano-mps-12k/">
     <meta property="og:image" content="https://herrei.github.io/gpt2-piano-mps-12k/social-preview.png">
@@ -15,10 +15,10 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="GPT-2 Piano MPS 12k">
-    <meta name="twitter:description" content="Symbolic piano MIDI continuation with a GPT-2-style model, Miditok REMI, PyTorch, and Apple Silicon MPS.">
+    <meta name="twitter:title" content="Piano model: from GPT-2 on a Mac to live RWKV-7">
+    <meta name="twitter:description" content="I’m building live piano music for PhantomHunt. From GPT-2 on a borrowed Mac to RWKV-7 with intensity controls, trained on two AMD GPUs.">
     <meta name="twitter:image" content="https://herrei.github.io/gpt2-piano-mps-12k/social-preview.png">
-    <title>GPT-2 Piano MPS 12k</title>
+    <title>Piano model: from GPT-2 on a Mac to a live RWKV-7</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
@@ -26,18 +26,17 @@
 
     <header class="site-header">
       <nav class="nav" aria-label="Primary navigation">
-        <a class="brand" href="#top" aria-label="GPT-2 Piano MPS 12k home">
+        <a class="brand" href="#top" aria-label="Piano model home">
           <span class="brand-mark" aria-hidden="true"></span>
-          GPT-2 Piano MPS 12k
+          Piano Model
         </a>
         <div class="nav-links">
-          <a href="#overview">Overview</a>
-          <a href="#pipeline">Pipeline</a>
-          <a href="#model">Model</a>
-          <a href="#checkpoints">Compare</a>
-          <a href="#run-local">Run</a>
+          <a href="#overview">The idea</a>
+          <a href="#v1">v1</a>
+          <a href="#live">Live budget</a>
+          <a href="#v2">v2</a>
+          <a href="#status">Status</a>
           <a href="#demo">Demo</a>
-          <a href="#side-experiment">Experiment</a>
           <a href="https://github.com/HerRei/gpt2-piano-mps-12k" rel="noreferrer">GitHub</a>
         </div>
       </nav>
@@ -46,22 +45,27 @@
     <main id="main">
       <section class="hero section" id="top" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">Symbolic piano continuation</p>
-          <h1 id="hero-title">GPT-2 Piano Generation on Apple Silicon</h1>
+          <p class="eyebrow">Live piano for a game</p>
+          <h1 id="hero-title">From GPT-2 on a Mac to a live RWKV-7</h1>
           <p class="hero-subtitle">
-            A small machine-learning music project that trains a GPT-2-style model to continue symbolic piano MIDI.
+            I want piano music for my game PhantomHunt that reacts to what happens in the game.
+            v1 was a GPT-2 trained on a Mac. It continues a piano passage, but it can't be steered
+            and cannot keep up on the PyTorch CPU path. v2 is an RWKV-7 with intensity controls. It is training
+            now on two AMD GPUs in my desktop.
           </p>
           <div class="button-row">
-            <a class="button primary" href="#demo">View Demo</a>
-            <a class="button secondary" href="https://github.com/HerRei/gpt2-piano-mps-12k" rel="noreferrer">View GitHub</a>
-            <a class="button ghost" href="#pipeline">See Pipeline</a>
+            <a class="button primary" href="#overview">Read the story</a>
+            <a class="button secondary" href="https://github.com/HerRei/gpt2-piano-mps-12k" rel="noreferrer">v1 code on GitHub</a>
+            <a class="button ghost" href="#status">Where it is now</a>
           </div>
           <ul class="tag-list">
             <li>PyTorch</li>
             <li>MIDI</li>
             <li>GPT-2</li>
-            <li>Miditok</li>
-            <li>Apple Silicon</li>
+            <li>RWKV-7</li>
+            <li>Intensity controls</li>
+            <li>ROCm</li>
+            <li>Core ML</li>
           </ul>
         </div>
 
@@ -100,60 +104,64 @@
             <span>Duration_1.0</span>
             <span>Pitch_67</span>
           </div>
-          <p class="visual-caption">MIDI notes are converted into REMI event tokens before the model predicts the continuation.</p>
+          <p class="visual-caption">Both models work on notes, not sound. MIDI is turned into event tokens, the model predicts the next ones, and a piano instrument plays the result.</p>
         </aside>
       </section>
 
       <section class="section overview" id="overview" aria-labelledby="overview-title">
         <div class="section-heading">
-          <p class="eyebrow">Overview</p>
-          <h2 id="overview-title">What this project is</h2>
+          <p class="eyebrow">The idea</p>
+          <h2 id="overview-title">Music that follows the game</h2>
+          <p>I got the idea from a project a friend was doing at MIT. I wanted live piano music for PhantomHunt that reacts to what’s happening in the game. At first, the hardware it seemed to need was completely out of scope. So I started with a smaller question: could I train a model to continue a piano passage?</p>
         </div>
         <div class="overview-grid">
-          <article class="text-card">
-            <h3>A GPT-2-style piano model</h3>
-            <p>
-              GPT-2 Piano MPS 12k is a symbolic music generator. Instead of natural-language prompts,
-              it reads short piano MIDI prompts, turns them into token sequences, and generates a continuation.
-            </p>
-          </article>
-          <article class="text-card">
-            <h3>Built as a training workflow</h3>
-            <p>
-              The repo includes scripts for splitting MIDI data, augmenting training files, tokenizing with
-              Miditok REMI, training the model, generating samples, and comparing checkpoints.
-            </p>
-          </article>
-          <article class="text-card">
-            <h3>Designed for a local machine</h3>
-            <p>
-              Training targets Apple Silicon MPS. Large artifacts such as datasets and checkpoints stay local,
-              so the public repo keeps the code and one tracked example MIDI.
-            </p>
-          </article>
+          <article class="text-card"><h3>First: continue a passage</h3><p>GPT-2 learned from piano performances on a borrowed Mac. It makes MIDI, and sometimes sounds wobbly. It gave me a place to start.</p></article>
+          <article class="text-card"><h3>Then: measure the gap</h3><p>Live music needs enough notes on time, room for the game to run, and a way to ask for quieter or busier playing.</p></article>
+          <article class="text-card"><h3>Now: train with controls</h3><p>RWKV-7 fits the measured speed budget. The first full epoch is running. Listening tests and the actual game test are still ahead.</p></article>
         </div>
+        <div class="callout"><strong>Music is the prompt</strong><p>Both versions generate MIDI: which notes to play, when, for how long and how loudly. A separate piano instrument makes the sound. There is no written prompt. This public repository contains the original GPT-2 code.</p></div>
+      </section>
 
-        <div class="tech-panel">
-          <span>PyTorch</span>
-          <span>Hugging Face Transformers</span>
-          <span>Miditok REMI</span>
-          <span>pretty_midi</span>
-          <span>NumPy</span>
-          <span>Apple Silicon MPS</span>
+      <section class="section" id="v1" aria-labelledby="v1-title">
+        <div class="section-heading"><p class="eyebrow">v1 · 2025–2026</p><h2 id="v1-title">GPT-2 on a borrowed Mac</h2>
+          <p>I borrowed a friend’s M1 Max and trained a 12-layer GPT-2 from scratch with PyTorch MPS. MidiTok’s REMI format turns performances into musical events, with bars and positions to mark the beat.</p>
+          <p>The data was MAESTRO: almost 200 hours of competition piano. It is small for this task and full of virtuoso playing. The repository’s “12k” is a leftover working name, not the number of pieces.</p>
+          <p>It can continue a passage, but it is an offline continuation model. I cannot steer it while it plays. Training longer did not automatically help: epoch 2 had validation loss 1.43, versus 1.53 at epoch 4.</p>
         </div>
+        <div class="button-row"><a class="button secondary" href="#checkpoints">Compare v1 checkpoints</a><a class="button ghost" href="#pipeline">v1 training workflow</a></div>
+      </section>
 
-        <div class="callout">
-          <strong>Not text-to-music</strong>
-          <p>This project does not take written prompts. It continues short MIDI or token prompts, so the input is musical context rather than natural language.</p>
+      <section class="section" id="live" aria-labelledby="live-title">
+        <div class="section-heading"><p class="eyebrow">Measurements · October 2026</p><h2 id="live-title">What it takes to play live</h2><p>I measured how quickly the music consumes tokens, then timed models on an M1 Pro. A good continuation is not enough if it arrives after the note should have played.</p></div>
+        <div class="overview-grid">
+          <article class="text-card"><h3>The v1 note budget</h3><p>REMI over 200 MAESTRO files needed about 40 tokens/s on average and 110 at the 99th percentile of one-second windows. The 87M GPT shape at 2,048 context managed 35 tokens/s on PyTorch CPU. It could not keep up even on average.</p></article>
+          <article class="text-card"><h3>One token, fixed-size state</h3><p>RWKV-7 carries a fixed-size recurrent state from one token to the next. A GPT’s attention history needs a cache. Moving that cache on every call was costly, and keeping it inside the model did not compile for the Neural Engine in my tests.</p></article>
+          <article class="text-card"><h3>Room for the game</h3><p>Aria’s tokenizer uses about three tokens per note. That gives about 12 ms per token for the 99th-percentile second. The 94M RWKV-7 step model took 3.5 ms median and 4.2 ms p99 with int8 weights on the M1 Pro Neural Engine.</p></article>
         </div>
+        <p class="small-note evidence-note">These are batch-one speed tests with random weights, not a listening test or an in-game benchmark. The real RWKV-7 step model was measured on 7 October. The earlier REMI budget and PyTorch CPU result were measured on 4 October.</p>
+      </section>
+
+      <section class="section" id="v2" aria-labelledby="v2-title">
+        <div class="section-heading"><p class="eyebrow">v2 · Training now</p><h2 id="v2-title">RWKV-7 with intensity controls</h2><p>I came back to the game idea with a 94M-parameter RWKV-7. I trimmed Aria’s tokenizer to piano, with a vocabulary of 2,176 tokens including 13 density and loudness control tokens.</p><p>The pruned Aria-MIDI dataset has about 4.6 billion tokens. It gives this run much more music to learn from than MAESTRO. I train on two AMD GPUs in my desktop: a Radeon RX 9060 XT and a Radeon VII, using ROCm and one process per card. Together they measured about 29.7k tokens/s, or an estimated 43 hours per epoch.</p></div>
+        <div class="overview-grid">
+          <article class="text-card"><h3>Learn controls from the music</h3><p>Every five seconds, the model gets density and loudness tokens computed from the coming music. During training, 15% of controls are dropped. That lets classifier-free guidance compare controlled and unconditioned predictions at runtime.</p></article>
+          <article class="text-card"><h3>A small, matched comparison</h3><p>At about 28M parameters and 250M training tokens on the same data, RWKV-7 reached validation loss 2.172. A GPT with rotary positions reached 2.258. That supported the choice of RWKV-7; it does not prove the final music will be better.</p></article>
+          <article class="text-card"><h3>Controls respond, then fade</h3><p>In fresh-state tests, density landed in the requested level 69–97% of the time. Soft versus loud gave MIDI velocities of 32 versus 99. But in long streams, “dense” fell from 9 notes/s in minute one to about 5 after 10–30 minutes.</p></article>
+        </div>
+        <div class="callout"><strong>Guidance held the controls in the small runs</strong><p>Comparing requested and contrasting controls at guidance strength 1 kept “dense” at 11 notes/s and “medium” at 2 at minute 15. This was a two-pass guidance experiment. The full run adds control dropout for classifier-free guidance, whose strength still needs tuning. Two passes would cost about 7 ms per token at 94M; that is an estimate, not an end-to-end game measurement.</p></div>
+      </section>
+
+      <section class="section" id="status" aria-labelledby="status-title">
+        <div class="section-heading"><p class="eyebrow">Status · 8 October 2026</p><h2 id="status-title">The first epoch is running</h2><p>I expect it to finish around 9 October. Next come listening tests, Core ML and ONNX exports of the trained checkpoint, and a test inside PhantomHunt.</p><p>The plan is to generate one or two seconds ahead. Controls apply at the next five-second segment. A simple rule layer can change velocity or thin notes immediately, while a game “conductor” brings themes back.</p></div>
+        <div class="callout"><strong>v2 samples coming after the first epoch</strong><p>There is no v2 audio here yet. The demo below is from the original GPT-2 model.</p></div>
       </section>
 
       <section class="section demo" id="demo" aria-labelledby="demo-title">
         <div class="demo-copy">
-          <p class="eyebrow">Demo</p>
-          <h2 id="demo-title">Demo</h2>
+          <p class="eyebrow">v1 demo</p>
+          <h2 id="demo-title">A GPT-2 continuation</h2>
           <p>
-            The model generates a continuation from a short piano MIDI prompt. This repo includes one tracked
+            I chose this continuation from a wider search using the epoch 2 checkpoint. This repo includes the
             sample output at <code>examples/generated-example.mid</code>.
           </p>
           <div class="button-row">
@@ -195,8 +203,8 @@
 
       <section class="section pipeline" id="pipeline" aria-labelledby="pipeline-title">
         <div class="section-heading">
-          <p class="eyebrow">Pipeline</p>
-          <h2 id="pipeline-title">How it works</h2>
+          <p class="eyebrow">v1 pipeline</p>
+          <h2 id="pipeline-title">How v1 works</h2>
           <p>
             The workflow keeps the music symbolic from start to finish: MIDI files become REMI tokens,
             the transformer learns token continuations, and generated tokens are written back to MIDI.
@@ -251,10 +259,10 @@
 
       <section class="section model" id="model" aria-labelledby="model-title">
         <div class="section-heading">
-          <p class="eyebrow">Model</p>
-          <h2 id="model-title">Model</h2>
+          <p class="eyebrow">v1 model</p>
+          <h2 id="model-title">The original GPT-2</h2>
           <p>
-            The current run uses a compact GPT-2-style configuration for symbolic music tokens.
+            v1 uses a compact GPT-2-style configuration for symbolic music tokens.
             It is prompt-conditioned by MIDI or token prefixes, not by text.
           </p>
         </div>
@@ -335,18 +343,19 @@
 
       <section class="section checkpoints" id="checkpoints" aria-labelledby="checkpoints-title">
         <div class="section-heading">
-          <p class="eyebrow">Checkpoint comparison</p>
-          <h2 id="checkpoints-title">Comparing saved runs</h2>
+          <p class="eyebrow">v1 checkpoint comparison</p>
+          <h2 id="checkpoints-title">Training longer didn't help</h2>
           <p>
-            The repo includes a small batch script for comparing checkpoints by generating MIDI continuations
-            from the same prompt profiles. Checkpoint files are local only and are not included in the repo.
+            The checkpoint after two epochs had a lower validation loss than the one after four, so epoch 2
+            stayed the best. Loss doesn't tell the whole story, so I also generated continuations from the
+            same prompt profiles to hear how checkpoints compare. Checkpoint files are local only.
           </p>
         </div>
 
         <div class="comparison-grid">
           <article class="comparison-card">
             <span class="step-number">epoch_02</span>
-            <h3>Local best note</h3>
+            <h3>Best checkpoint</h3>
             <strong>val_loss 1.429826</strong>
             <p>Saved as <code>checkpoints/best</code> on the local training machine.</p>
           </article>
@@ -365,46 +374,19 @@
         </div>
       </section>
 
-      <section class="section run-local" id="run-local" aria-labelledby="run-local-title">
-        <div class="section-heading">
-          <p class="eyebrow">Local use</p>
-          <h2 id="run-local-title">Run it locally</h2>
-          <p>
-            The code is set up for local experiments. Training and generation need local MIDI data and local checkpoints.
-          </p>
-        </div>
-
-        <div class="run-grid">
-          <article class="command-card">
-            <h3>Smoke check</h3>
-            <pre><code>python3 -m pip install -r requirements-smoke.txt
-python3 -m unittest tests.test_dependency_smoke</code></pre>
-          </article>
-          <article class="command-card">
-            <h3>Training pipeline</h3>
-            <pre><code>python3 scripts/prepare_12k_split.py
-python3 scripts/augment_train_transpose.py
-python3 scripts/tokenize_12k_augmented.py
-python3 scripts/train_gpt2_piano_12k.py --train-from-scratch</code></pre>
-          </article>
-          <article class="command-card">
-            <h3>Generate after training</h3>
-            <pre><code>python3 scripts/generate_piano_sample.py \
-  --checkpoint checkpoints/best</code></pre>
-          </article>
-        </div>
-      </section>
-
       <section class="section side-experiment" id="side-experiment" aria-labelledby="intensity-title">
         <div class="section-heading">
-          <p class="eyebrow">Side experiment</p>
+          <p class="eyebrow">v1 side experiment</p>
           <h2 id="intensity-title">Melody Intensity Editor</h2>
           <p>
-            This side experiment explores controlling the density and energy of generated phrases with an
-            intensity value from 0.0 to 1.0.
+            The game idea left one smaller experiment behind: you give it a short melody and an intensity from
+            0.0 to 1.0, and it plays back a softer and sparser or a louder and denser version. It only works on
+            short phrases. The slider below is an illustration, not the model. The same idea became the control
+            tokens in v2.
           </p>
         </div>
 
+        <p class="small-note">This slider is a visual illustration, not model inference. The actual editor works on short phrases and is not a note-preserving live editor or the v2 control system.</p>
         <div class="intensity-card">
           <div class="slider-labels">
             <span>soft / sparse</span>
@@ -444,11 +426,12 @@ python3 scripts/train_gpt2_piano_12k.py --train-from-scratch</code></pre>
         </div>
       </section>
 
-      <section class="section limitations" aria-labelledby="limitations-title">
+      <section class="section limitations" id="limitations" aria-labelledby="limitations-title">
         <div class="section-heading">
           <p class="eyebrow">Notes</p>
           <h2 id="limitations-title">Limitations</h2>
         </div>
+        <h3 class="group-title">v1</h3>
         <div class="limitations-grid">
           <article class="text-card">
             <h3>Local artifacts</h3>
@@ -459,28 +442,77 @@ python3 scripts/train_gpt2_piano_12k.py --train-from-scratch</code></pre>
             <p>Output quality depends on the MIDI prompt and the checkpoint being sampled.</p>
           </article>
           <article class="text-card">
-            <h3>MIDI continuation</h3>
-            <p>This is MIDI continuation, not text-to-music generation from written prompts.</p>
+            <h3>Random split</h3>
+            <p>The split is random by file, not MAESTRO's official one, so related pieces can land on both sides and flatter the validation loss.</p>
           </article>
           <article class="text-card">
             <h3>Experimental control</h3>
-            <p>The Melody Intensity Editor is still a side experiment.</p>
+            <p>The Melody Intensity Editor is still a side experiment and only works on short phrases.</p>
+          </article>
+        </div>
+        <h3 class="group-title">v2</h3>
+        <div class="limitations-grid">
+          <article class="text-card">
+            <h3>Not finished</h3>
+            <p>Training is still running. The numbers above come from small test runs, not from the final model.</p>
+          </article>
+          <article class="text-card">
+            <h3>No long-form structure</h3>
+            <p>On its own it keeps playing but doesn't build themes. The game needs a "conductor" that re-seeds themes and sets the controls.</p>
+          </article>
+          <article class="text-card">
+            <h3>Non-commercial data</h3>
+            <p>Aria-MIDI is CC BY-NC-SA, like MAESTRO, so the model is for non-commercial use only.</p>
+          </article>
+          <article class="text-card">
+            <h3>Code not public yet</h3>
+            <p>The repository linked here is v1. The v2 code isn't public.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section run-local" id="run-local" aria-labelledby="run-local-title">
+        <div class="section-heading">
+          <p class="eyebrow">v1 local use</p>
+          <h2 id="run-local-title">Run v1 locally</h2>
+          <p>
+            The code is set up for local experiments. Training and generation need local MIDI data and local checkpoints.
+          </p>
+        </div>
+
+        <div class="run-grid">
+          <article class="command-card">
+            <h3>Smoke check</h3>
+            <pre><code>python3 -m pip install -r requirements-smoke.txt
+python3 -m unittest tests.test_dependency_smoke</code></pre>
+          </article>
+          <article class="command-card">
+            <h3>Training pipeline</h3>
+            <pre><code>python3 scripts/prepare_12k_split.py
+python3 scripts/augment_train_transpose.py
+python3 scripts/tokenize_12k_augmented.py
+python3 scripts/train_gpt2_piano_12k.py --train-from-scratch</code></pre>
+          </article>
+          <article class="command-card">
+            <h3>Generate after training</h3>
+            <pre><code>python3 scripts/generate_piano_sample.py \
+  --checkpoint checkpoints/best</code></pre>
           </article>
         </div>
       </section>
 
       <section class="section final-cta" aria-labelledby="final-title">
         <p class="eyebrow">Next step</p>
-        <h2 id="final-title">Train. Compare. Generate.</h2>
+        <h2 id="final-title">Listen. Export. Play it in the game.</h2>
         <div class="button-row">
-          <a class="button primary" href="https://github.com/HerRei/gpt2-piano-mps-12k" rel="noreferrer">Open GitHub Repository</a>
-          <a class="button secondary" href="https://github.com/HerRei/gpt2-piano-mps-12k/raw/main/examples/generated-example.mid" download="generated-example.mid">Download Sample MIDI</a>
+          <a class="button primary" href="https://github.com/HerRei/gpt2-piano-mps-12k" rel="noreferrer">Open v1 on GitHub</a>
+          <a class="button secondary" href="https://github.com/HerRei/gpt2-piano-mps-12k/raw/main/examples/generated-example.mid" download="generated-example.mid">Download v1 Sample MIDI</a>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>GPT-2 Piano MPS 12k · symbolic MIDI generation with PyTorch</p>
+      <p>Piano model · v1: GPT-2 on Apple Silicon · v2: RWKV-7 with intensity controls, in training</p>
     </footer>
 
     <script src="script.js"></script>
