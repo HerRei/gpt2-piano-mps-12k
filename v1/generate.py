@@ -64,8 +64,6 @@ def main():
     if a.prompt_seconds is not None:
         score = Score(a.prompt).to("second").clip(0, a.prompt_seconds, clip_end=False).to("tick")
         ids = ids_of(tok, score).tolist()
-        if len(ids) > KEEP:
-            raise SystemExit(f"the first {a.prompt_seconds} s are {len(ids)} tokens; at most {KEEP} fit")
         start = a.prompt_seconds
     elif a.prompt:
         ids = ids_of(tok, a.prompt).tolist()[-a.prompt_tokens:]
@@ -84,7 +82,7 @@ def main():
         return out[0, len(ctx):].tolist()
 
     if a.seconds is None:
-        ids += extend(ids, a.new_tokens)
+        ids += extend(ids[-(BLOCK - a.new_tokens):], a.new_tokens)
         score = tok.decode([ids])
     else:
         end = start + a.seconds

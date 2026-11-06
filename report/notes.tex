@@ -167,12 +167,14 @@ controls, does not. So the default is no guidance, which keeps the cost at one m
 \subsection{Comparison with real playing}
 
 96 recordings from v2's validation split (one file each, no silent five seconds in the first minute) supply the
-first 20 seconds; each model continues for 40 seconds without controls or guidance, two samples per piece. A logistic
+first 20 seconds; each model continues for 40 seconds without controls or guidance, two samples per piece (v1 with
+\texttt{v1/generate.py -{}-prompt\_seconds 20 -{}-seconds 40}, seeds 0 and 1). A logistic
 regression on 22 features of seconds 20 to 60 tries to tell the real continuation from the model's. The features
 include key fit, notes outside the key, interval, pitch-class and rhythm variety, leaps, range, loudness spread, note
 density, polyphony and how often a short figure repeats. It is scored by five-fold cross-validation grouped by
-piece (\texttt{eval/compare.py}). To check that the test separates damage from quality, damaged copies of the
-real pieces go through the same test.
+piece (\texttt{eval/compare.py}). A note counts as sounding until its key and the sustain pedal are both up, so
+v1's pedal is heard as a pianist would hear it. To check that the test separates damage from quality, damaged
+copies of the real pieces go through the same test.
 
 \begin{table}[h]
 \centering\small
@@ -180,12 +182,14 @@ real pieces go through the same test.
 \toprule
 & AUC & 95\,\% interval & Model rated more real \\
 \midrule
-v2, second pass & 0.64 & 0.59--0.69 & 30\,\% \\
-v2, first pass & 0.68 & 0.63--0.72 & 24\,\% \\
-v2, step 2,000 of the second pass & 0.69 & 0.65--0.73 & 22\,\% \\
+v2, second pass & 0.64 & 0.58--0.69 & 30\,\% \\
+v2, first pass & 0.68 & 0.64--0.73 & 24\,\% \\
+v2, step 2,000 of the second pass & 0.69 & 0.64--0.74 & 22\,\% \\
+v1 & 0.89 & 0.85--0.92 & 8\,\% \\
 \midrule
 5\,\% of notes moved by 1--2 semitones & 0.62 & 0.59--0.66 & \\
 15\,\% of notes moved & 0.79 & 0.75--0.84 & \\
+real playing through v1's REMI tokens & 0.80 & 0.75--0.85 & \\
 pitches shuffled & 0.89 & 0.85--0.93 & \\
 random timing & 0.99 & 0.99--1.00 & \\
 random pitches & 1.00 & 1.00--1.00 & \\
@@ -201,6 +205,14 @@ of $-0.002$ to 0.094 over pieces: probably real, not certain with 96 pieces. Wha
 playing is variety, each by about a third of a standard deviation: fewer different intervals, flatter loudness,
 less varied note timing and fewer pitch classes. Key fit, notes outside the key, leaps and range do not stand out
 any more. The early checkpoint repeats short figures far too often (0.76 standard deviations above real playing).
+
+v1 is much easier to tell apart, about as easy as shuffled pitches. Part of that is its tokens: the real pieces
+alone, written into v1's REMI tokens and back, already score 0.80, mostly because REMI puts every onset on a grid
+of an eighth of a beat. Compared against those tokenized pieces instead, v1 scores 0.84 (0.80--0.89). What still
+gives it away is loudness that barely changes from one note to the next (0.95 standard deviations above real
+playing), short figures repeated too often (0.64), and a weaker sense of key. These pieces come from Aria-MIDI and
+not from MAESTRO, so v1 plays outside its training data here; v2 was trained on the same kind of recordings.
+
 None of this measures whether the music is pleasant.
 
 \subsection{Speed and memory}

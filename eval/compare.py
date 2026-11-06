@@ -33,13 +33,26 @@ T0, T1 = 20.0, 60.0  # set from --start/--end
 
 
 def read(path):
-    m = mido.MidiFile(path); t = 0.0; on = {}; out = []
+    """(onset, duration, pitch, velocity) in seconds. A note sounds until its key is up and the sustain
+    pedal (CC 64) is up, or until the same key is struck again."""
+    m = mido.MidiFile(path); t = 0.0; on = {}; held = {}; pedal = False; out = []
     for msg in m:
         t += msg.time
-        if msg.type == "note_on" and msg.velocity > 0:
+        if msg.type == "control_change" and msg.control == 64:
+            pedal = msg.value >= 64
+            if not pedal:
+                out += [(s, t - s, note, v) for note, (s, v) in held.items()]
+                held = {}
+        elif msg.type == "note_on" and msg.velocity > 0:
+            if msg.note in held:
+                s, v = held.pop(msg.note); out.append((s, t - s, msg.note, v))
             on[msg.note] = (t, msg.velocity)
         elif msg.type in ("note_off", "note_on") and msg.note in on:
-            s, v = on.pop(msg.note); out.append((s, t - s, msg.note, v))
+            if pedal:
+                held[msg.note] = on.pop(msg.note)
+            else:
+                s, v = on.pop(msg.note); out.append((s, t - s, msg.note, v))
+    out += [(s, t - s, note, v) for note, (s, v) in held.items()]
     a = np.array(sorted(out), dtype=float).reshape(-1, 4)
     return a
 

@@ -155,12 +155,15 @@ the same time is not measured yet.
 - **Second pass.** Training the same data a second time from the checkpoint before the learning-rate decay took
   the validation loss from 1.7929 to 1.7493.
 - **Compared with real playing.** On 96 held-out recordings, a classifier on note statistics tells the second
-  pass apart from the real continuation with an AUC of 0.64 (95 % interval 0.59 to 0.69), against 0.68 for the
+  pass apart from the real continuation with an AUC of 0.64 (95 % interval 0.58 to 0.69), against 0.68 for the
   first pass. 0.5 would mean it cannot tell. Damaged copies of the real pieces score from 0.62 (5 % wrong notes)
   to 1.00. What still gives the model away is variety: fewer different intervals, flatter loudness and less
   varied rhythm. No listener has rated it.
-- **v1.** The retraining reached a validation loss of 1.4131, against 1.43 for the original run. It has not been
-  compared with real playing yet.
+- **v1.** The retraining reached a validation loss of 1.4131, against 1.43 for the original run. In the same test
+  it is easy to tell apart: AUC 0.89 (0.85 to 0.92). Part of that is its tokens, since the real pieces alone, passed
+  through v1's REMI tokens and back, already score 0.80; against those, v1 scores 0.84. Its loudness barely changes
+  from note to note and it repeats short figures too often. The test pieces are from Aria-MIDI, not from v1's
+  MAESTRO.
 
 The notes in `report/` have the tables, the method of each test and what went wrong on the way.
 
