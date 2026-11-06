@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#11120f" />
+    <meta
+      name="description"
+      content="I’m building piano music that reacts to my game. From GPT-2 on a borrowed Mac to RWKV-7 with intensity controls: the music, the measurements, and the work still ahead."
+    />
+    <meta
+      property="og:title"
+      content="Piano, with a pulse. — Hermes’s piano model"
+    />
+    <meta
+      property="og:description"
+      content="From a borrowed Mac to two AMD GPUs. An ongoing experiment in live, game-reactive piano, from GPT-2 to RWKV-7."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://herrei.github.io/gpt2-piano-mps-12k/"
+    />
+    <meta
+      property="og:image"
+      content="https://herrei.github.io/gpt2-piano-mps-12k/social-preview.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Piano, with a pulse. From GPT-2 to RWKV-7, with a piano-roll illustration."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Piano, with a pulse." />
+    <meta
+      name="twitter:description"
+      content="Building live piano for PhantomHunt. The story from GPT-2 on a Mac to RWKV-7 with intensity controls."
+    />
+    <meta
+      name="twitter:image"
+      content="https://herrei.github.io/gpt2-piano-mps-12k/social-preview.png"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Piano, with a pulse. | GPT-2 → RWKV-7</title>
+    <script type="module" crossorigin src="./assets/index-zESP4eou.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BREDJRQ4.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <svg
+      class="svg-definitions"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <symbol id="arrow" viewBox="0 0 24 24">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </symbol>
+      <symbol id="arrow-up" viewBox="0 0 24 24">
+        <path d="M6 18 18 6M6 6h12v12" />
+      </symbol>
+      <symbol id="play" viewBox="0 0 24 24">
+        <path d="m8 5 11 7-11 7Z" />
+      </symbol>
+    </svg>
+    <header class="site-header">
+      <a href="#top" class="brand" aria-label="Piano model home"
+        ><span class="brand-keys" aria-hidden="true"
+          ><i></i><i></i><i></i><i></i></span
+        ><span>hermes<span class="brand-divider">/</span>piano</span></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#story">The story</a><a href="#demo">Listen</a
+        ><a href="#v2">The next model</a>
+      </nav>
+      <a class="header-link" href="https://github.com/HerRei/gpt2-piano-mps-12k"
+        >v1 source <svg><use href="#arrow-up" /></svg
+      ></a>
+      <div class="reading-progress" aria-hidden="true"></div>
+    </header>
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-atmosphere" aria-hidden="true"></div>
+        <div class="hero-topline mono">
+          <span>Independent experiment · 2025–2026</span
+          ><span class="status-dot">In development</span>
+        </div>
+        <div class="hero-copy">
+          <h1 id="hero-title">
+            <span>Piano,</span><span>with a</span><em>pulse.</em>
+          </h1>
+          <p class="hero-description">
+            I’m building piano music that reacts to my game. From GPT-2 on a
+            borrowed Mac to RWKV-7 with intensity controls.
+          </p>
+          <a class="button button-acid" href="#demo"
+            ><span>Hear where it started</span><svg><use href="#play" /></svg
+          ></a>
+        </div>
+        <div
+          class="hero-instrument"
+          role="group"
+          aria-label="Illustration of MIDI notes flowing towards a piano keyboard"
+        >
+          <div id="piano-scene" aria-hidden="true">
+            <div class="piano-fallback">
+              <span></span><span></span><span></span><span></span><span></span
+              ><span></span><span></span>
+            </div>
+          </div>
+          <div class="instrument-caption mono">
+            <span class="tiny-cross">+</span> Notes, not sound.<br /><span
+              class="caption-indent"
+              >MIDI → model → piano</span
+            >
+          </div>
+          <button
+            id="motion-toggle"
+            class="motion-toggle mono"
+            type="button"
+            aria-pressed="false"
+          >
+            Pause motion <span aria-hidden="true">Ⅱ</span>
+          </button>
+        </div>
+        <div class="hero-bottom mono">
+          <span>Made for PhantomHunt</span
+          ><a href="#story"
+            >Scroll to explore <span aria-hidden="true">↓</span></a
+          ><span>By Hermes</span>
+        </div>
+      </section>
+
+      <section
+        class="story section light"
+        id="story"
+        aria-labelledby="story-title"
+      >
+        <div class="section-index mono">
+          <span>01 / THE IDEA</span><span>A game, then a detour</span>
+        </div>
+        <div class="story-layout">
+          <h2 class="display reveal" id="story-title">
+            What if the music<br />could <em>play along?</em>
+          </h2>
+          <div class="story-copy reveal">
+            <p class="lead">
+              A quiet room. A chase. A moment to breathe. I wanted the piano in
+              PhantomHunt to follow what was happening.
+            </p>
+            <p>
+              The idea came from a friend’s project at MIT. At first, the
+              hardware it seemed to need was completely out of scope. So I
+              started with a smaller question: could I train a model to continue
+              a piano passage?
+            </p>
+            <p>That became one project, in two chapters.</p>
+          </div>
+        </div>
+        <div class="chapter-track">
+          <a href="#v1" class="chapter-link reveal"
+            ><span class="mono">2025–2026 / CHAPTER 01</span
+            ><strong>Learn to continue.</strong
+            ><span>GPT-2 · Apple Silicon</span
+            ><svg><use href="#arrow-up" /></svg
+          ></a>
+          <a href="#v2" class="chapter-link reveal"
+            ><span class="mono">OCTOBER 2026 / CHAPTER 02</span
+            ><strong>Learn to respond.</strong><span>RWKV-7 · Two AMD GPUs</span
+            ><svg><use href="#arrow-up" /></svg
+          ></a>
+        </div>
+      </section>
+
+      <section class="section v1" id="v1" aria-labelledby="v1-title">
+        <div class="section-index mono">
+          <span>02 / THE FIRST NOTES</span
+          ><span class="version-tag">v1 · GPT-2</span>
+        </div>
+        <div class="split-heading">
+          <h2 class="display reveal" id="v1-title">
+            A borrowed Mac.<br />A <em>beginning.</em>
+          </h2>
+          <p class="section-intro reveal">
+            I borrowed a friend’s M1 Max and trained a 12-layer GPT-2 from
+            scratch. No English model underneath. Just piano performances,
+            turned into musical events.
+          </p>
+        </div>
+        <div class="v1-panels">
+          <div class="spec-panel reveal">
+            <div class="panel-top mono">THE FIRST MODEL <span>↗</span></div>
+            <div class="large-stat">200<span>h</span></div>
+            <p>Almost 200 hours of MAESTRO competition piano.</p>
+            <dl class="spec-list">
+              <div>
+                <dt>Architecture</dt>
+                <dd>12-layer GPT-2</dd>
+              </div>
+              <div>
+                <dt>Context</dt>
+                <dd>2,048 tokens</dd>
+              </div>
+              <div>
+                <dt>Tokenizer</dt>
+                <dd>MidiTok REMI</dd>
+              </div>
+              <div>
+                <dt>Training</dt>
+                <dd>PyTorch / MPS</dd>
+              </div>
+            </dl>
+          </div>
+          <div class="checkpoint-panel reveal" id="checkpoints">
+            <div class="panel-top mono">
+              CHECKPOINT COMPARISON <span>LOWER IS BETTER</span>
+            </div>
+            <h3>The earlier checkpoint<br />stayed ahead.</h3>
+            <div class="loss-row">
+              <div><span>Epoch 02</span><strong>1.43</strong></div>
+              <div class="loss-track">
+                <i style="--bar: 86%"></i><span class="mono">KEPT</span>
+              </div>
+            </div>
+            <div class="loss-row secondary">
+              <div><span>Epoch 04</span><strong>1.53</strong></div>
+              <div class="loss-track"><i style="--bar: 92%"></i></div>
+            </div>
+            <p>
+              Validation loss went up after epoch 2, so I kept the earlier
+              checkpoint. Loss is only part of the story. I also generated
+              continuations to hear the difference.
+            </p>
+          </div>
+        </div>
+        <div class="footnote mono">
+          “12k” in the repository name is a leftover working name, not a count
+          of training pieces.
+        </div>
+      </section>
+
+      <section
+        class="section demo-section"
+        id="demo"
+        aria-labelledby="demo-title"
+      >
+        <div class="demo-heading">
+          <span class="mono section-kicker">LISTEN / V1</span>
+          <h2 id="demo-title">
+            A little wobbly.<br /><em>Still fascinating.</em>
+          </h2>
+          <p>
+            A continuation from the best GPT-2 checkpoint. I chose it from a
+            wider search and shortened the long pauses.
+          </p>
+        </div>
+        <div class="audio-player" id="audio-player">
+          <div class="audio-player-top mono">
+            <span>01 / GPT-2 CONTINUATION</span
+            ><span>MAESTRO → REMI → MIDI</span>
+          </div>
+          <div class="audio-main">
+            <button
+              id="audio-play"
+              class="audio-play"
+              type="button"
+              aria-label="Play GPT-2 piano sample"
+              disabled
+            >
+              <svg><use href="#play" /></svg>
+            </button>
+            <div class="waveform" aria-hidden="true"></div>
+          </div>
+          <audio
+            id="piano-audio"
+            controls
+            preload="metadata"
+            src="./audio/v1-salamander.m4a"
+          >
+            Your browser does not support audio.
+            <a href="/audio/v1-salamander.m4a">Download the sample</a>.
+          </audio>
+          <div class="audio-scrub">
+            <label class="sr-only" for="audio-seek">Playback position</label
+            ><input
+              type="range"
+              id="audio-seek"
+              min="0"
+              max="100"
+              step="0.1"
+              value="0"
+              disabled
+            />
+            <div class="audio-times mono">
+              <span id="audio-time">0:00</span
+              ><span id="audio-duration">—</span>
+            </div>
+          </div>
+          <div class="audio-footer">
+            <span id="audio-status" class="mono" role="status"
+              >SELECTED V1 SAMPLE</span
+            ><a
+              href="https://github.com/HerRei/gpt2-piano-mps-12k/raw/main/examples/generated-example.mid"
+              >Original MIDI <span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <p class="audio-credit">
+            Played on Salamander Grand Piano by Alexander Holm,
+            <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a
+            >. The MIDI download retains the original pauses.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="section light live-section"
+        id="live"
+        aria-labelledby="live-title"
+      >
+        <div class="section-index mono">
+          <span>03 / THE REAL-TIME QUESTION</span
+          ><span>Measured October 2026</span>
+        </div>
+        <div class="split-heading">
+          <h2 class="display reveal" id="live-title">
+            The next note<br />has a <em>deadline.</em>
+          </h2>
+          <p class="section-intro reveal">
+            A continuation is not live game music. It has to arrive on time,
+            leave room for the game, and respond when the mood changes. v1
+            couldn’t do that.
+          </p>
+        </div>
+        <div class="budget-grid">
+          <div class="budget-chart reveal">
+            <div class="panel-top mono">
+              V1 / TOKENS PER SECOND <span>MORE IS FASTER</span>
+            </div>
+            <div class="budget-bar">
+              <span>GPT-2 · PyTorch CPU</span>
+              <div><i style="--bar: 31.8%"></i><strong>35</strong></div>
+            </div>
+            <div class="budget-bar needed">
+              <span>What the music needs · average</span>
+              <div><i style="--bar: 36.4%"></i><strong>40</strong></div>
+            </div>
+            <div class="budget-bar peak">
+              <span>What the music needs · 99th percentile</span>
+              <div><i style="--bar: 100%"></i><strong>110</strong></div>
+            </div>
+            <p>
+              87M GPT shape, 2,048-token context, on an M1 Pro. The REMI budget
+              came from 200 MAESTRO files. The PyTorch CPU path fell short even
+              on average.
+            </p>
+          </div>
+          <div class="latency-panel reveal">
+            <span class="mono">V2 / ONE TOKEN ON THE NEURAL ENGINE</span>
+            <div class="latency-number">3.5<small>ms</small></div>
+            <p>
+              A 94M RWKV-7 step, with int8 weights.<br />4.2 ms at the 99th
+              percentile.
+            </p>
+            <div class="latency-scale">
+              <i></i><span class="mono">12 ms budget</span>
+            </div>
+            <p class="small">
+              Aria’s roughly three tokens per note allow about 12 ms per token
+              in the 99th-percentile second.
+            </p>
+          </div>
+        </div>
+        <div class="architecture-note reveal">
+          <div class="memory-art" aria-hidden="true">
+            <span class="mono">TOKEN</span><i>→</i>
+            <div class="state-box">STATE<span>↻</span></div>
+            <i>→</i><span class="mono">TOKEN</span>
+          </div>
+          <div>
+            <h3>A memory that stays the same size.</h3>
+            <p>
+              RWKV-7 carries a fixed-size state from one token to the next. A
+              GPT carries an attention cache. Moving that cache was costly;
+              keeping it inside the model did not compile for the Neural Engine
+              in my tests.
+            </p>
+          </div>
+        </div>
+        <p class="footnote">
+          Speed tests used random weights, batch one, on an M1 Pro. These are
+          model timings, not an in-game benchmark or a judgement of the music.
+          RWKV-7 was measured on 7 October; the REMI budget and GPT CPU result
+          on 4 October.
+        </p>
+      </section>
+
+      <section class="section v2-section" id="v2" aria-labelledby="v2-title">
+        <div class="section-index mono">
+          <span>04 / BACK TO THE GAME</span
+          ><span class="version-tag green">v2 · RWKV-7</span>
+        </div>
+        <div class="split-heading">
+          <h2 class="display reveal" id="v2-title">
+            Same idea.<br /><em>Different engine.</em>
+          </h2>
+          <p class="section-intro reveal">
+            I came back to the original goal with a recurrent model, much more
+            music, and controls from the start. It trains on two AMD GPUs in my
+            desktop.
+          </p>
+        </div>
+        <div class="v2-stats">
+          <div class="reveal">
+            <span class="mono">THE MODEL</span><strong>94<span>M</span></strong>
+            <p>RWKV-7 parameters</p>
+          </div>
+          <div class="reveal">
+            <span class="mono">THE DATA</span><strong>4.6<span>B</span></strong>
+            <p>Pruned Aria-MIDI tokens</p>
+          </div>
+          <div class="reveal">
+            <span class="mono">THE PACE</span
+            ><strong>29.7<span>k</span></strong>
+            <p>Training tokens / second</p>
+          </div>
+        </div>
+        <div class="v2-detail-grid">
+          <article class="reveal">
+            <span class="mono">01 / VOCABULARY</span>
+            <h3>Piano, pared back.</h3>
+            <p>
+              Aria’s tokenizer, trimmed to piano. 2,176 tokens, including 13
+              control tokens for density and loudness. A much larger dataset
+              than MAESTRO’s few million tokens.
+            </p>
+          </article>
+          <article class="reveal">
+            <span class="mono">02 / CONDITIONING</span>
+            <h3>Music with instructions.</h3>
+            <p>
+              Every five seconds, controls describe the coming music: eight
+              density levels and five loudness levels. Dropping controls 15% of
+              the time enables classifier-free guidance.
+            </p>
+          </article>
+          <article class="reveal">
+            <span class="mono">03 / HARDWARE</span>
+            <h3>Trained at home.</h3>
+            <p>
+              A Radeon RX 9060 XT and a Radeon VII. ROCm, one process per card.
+              About 43 hours for one epoch at the measured training speed.
+            </p>
+          </article>
+        </div>
+        <div
+          class="signal-flow reveal"
+          role="group"
+          aria-label="Planned path from game to music"
+        >
+          <div><span class="mono">01</span><strong>Game state</strong></div>
+          <i aria-hidden="true">→</i>
+          <div><span class="mono">02</span><strong>Controls</strong></div>
+          <i aria-hidden="true">→</i>
+          <div class="signal-core">
+            <span class="mono">03</span><strong>RWKV-7</strong>
+          </div>
+          <i aria-hidden="true">→</i>
+          <div><span class="mono">04</span><strong>1–2 s buffer</strong></div>
+          <i aria-hidden="true">→</i>
+          <div><span class="mono">05</span><strong>Piano</strong></div>
+        </div>
+        <p class="footnote">
+          The planned in-game loop. Controls take effect at the next five-second
+          segment. A rule layer can change velocity or thin notes immediately.
+        </p>
+      </section>
+
+      <section
+        class="section controls-section"
+        id="side-experiment"
+        aria-labelledby="controls-title"
+      >
+        <div class="controls-copy">
+          <span class="mono section-kicker">V1 SIDE EXPERIMENT</span>
+          <h2 class="display" id="controls-title">
+            Less rush.<br /><em>More room.</em>
+          </h2>
+          <p>
+            The game idea left an intensity editor behind: a softer, sparser
+            phrase or a louder, denser one.
+          </p>
+          <p>
+            The actual experiment works on short phrases. This preview
+            illustrates the idea; it does not run either model.
+          </p>
+          <div class="control-label">
+            <label for="intensity-range">Intensity</label
+            ><output id="intensity-value" for="intensity-range">0.45</output>
+          </div>
+          <input
+            id="intensity-range"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.45"
+          />
+          <div class="range-labels mono">
+            <span>SOFT / SPARSE</span><span>LOUD / DENSE</span>
+          </div>
+        </div>
+        <div class="control-instrument">
+          <div class="panel-top mono">
+            <span>PHRASE SKETCH</span><span id="intensity-mode">BALANCED</span>
+          </div>
+          <div class="interactive-roll" aria-hidden="true">
+            <div class="roll-labels">
+              <span>C6</span><span>C5</span><span>C4</span><span>C3</span>
+            </div>
+            <div class="control-notes"></div>
+            <div class="roll-playhead"></div>
+          </div>
+          <div class="mini-keyboard" aria-hidden="true"></div>
+          <div class="control-readout mono" aria-live="polite">
+            <span id="intensity-note-count">Preview notes</span
+            ><span id="intensity-velocity">Velocity target</span>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="section evidence-section light"
+        id="evidence"
+        aria-labelledby="evidence-title"
+      >
+        <div class="section-index mono">
+          <span>05 / WHAT THE TESTS SAY</span
+          ><span>Small runs. Useful signals.</span>
+        </div>
+        <div class="split-heading">
+          <h2 class="display reveal" id="evidence-title">
+            Measure first.<br /><em>Listen next.</em>
+          </h2>
+          <p class="section-intro reveal">
+            These tests helped choose the architecture and training recipe. They
+            do not tell me whether the full model makes music I want to hear.
+          </p>
+        </div>
+        <div class="evidence-grid">
+          <article class="evidence-card reveal">
+            <span class="mono">A / ARCHITECTURE</span>
+            <h3>RWKV-7 came out ahead.</h3>
+            <div class="ab-values">
+              <div><span>RWKV-7</span><strong>2.172</strong></div>
+              <div><span>GPT</span><strong>2.258</strong></div>
+            </div>
+            <p>
+              Validation loss at about 28M parameters each, after 250M tokens on
+              the same data. The GPT used rotary positions.
+            </p>
+          </article>
+          <article class="evidence-card reveal">
+            <span class="mono">B / CONTROL</span>
+            <h3>Soft and loud separate.</h3>
+            <div class="ab-values">
+              <div><span>Soft</span><strong>32</strong></div>
+              <div><span>Loud</span><strong>99</strong></div>
+            </div>
+            <p>
+              MIDI velocity in fresh-state tests. Density landed in the
+              requested level 69–97% of the time.
+            </p>
+          </article>
+          <article class="evidence-card reveal">
+            <span class="mono">C / LONG STREAMS</span>
+            <h3>Guidance keeps it on track.</h3>
+            <div class="ab-values">
+              <div>
+                <span>Dense, guided</span><strong>11<small>/s</small></strong>
+              </div>
+              <div>
+                <span>Medium, guided</span><strong>2<small>/s</small></strong>
+              </div>
+            </div>
+            <p>
+              Notes per second at minute 15, with guidance strength 1. Without
+              guidance, “dense” faded from 9 to about 5 notes/s after 10–30
+              minutes.
+            </p>
+          </article>
+        </div>
+        <details class="disclosure">
+          <summary>
+            What guidance did, and what still needs testing
+            <span aria-hidden="true">+</span>
+          </summary>
+          <div>
+            <p>
+              The small runs compared requested and contrasting controls,
+              running each token step twice. The full recipe adds control
+              dropout for classifier-free guidance. That compares controlled and
+              unconditioned predictions; its strength still needs tuning.
+            </p>
+            <p>
+              Two passes at 94M would cost about 7 ms per token on the Neural
+              Engine. That is an estimate. It has not been measured as part of
+              the game.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section
+        class="section status-section"
+        id="status"
+        aria-labelledby="status-title"
+      >
+        <div class="section-index mono">
+          <span>06 / STILL WRITING THE NEXT BAR</span
+          ><span>Update: 8 October 2026</span>
+        </div>
+        <div class="status-layout">
+          <div>
+            <span class="status-dot mono">FIRST EPOCH RUNNING</span>
+            <h2 class="display reveal" id="status-title">
+              Not finished.<br /><em>Getting closer.</em>
+            </h2>
+            <p>
+              The first full epoch is running, expected to finish around 9
+              October. The next step is to hear what it learned.
+            </p>
+            <p class="sample-placeholder">
+              <span aria-hidden="true">♪</span> v2 samples coming after the
+              first epoch.
+            </p>
+          </div>
+          <ol class="roadmap">
+            <li class="current">
+              <span class="mono">01 / NOW</span>
+              <h3>Train the first epoch</h3>
+              <p>One pass through the pruned Aria-MIDI dataset.</p>
+            </li>
+            <li>
+              <span class="mono">02 / NEXT</span>
+              <h3>Listen and calibrate</h3>
+              <p>Judge the music and tune the control strength.</p>
+            </li>
+            <li>
+              <span class="mono">03 / THEN</span>
+              <h3>Export the trained model</h3>
+              <p>Core ML for Macs. ONNX for the portable runtime.</p>
+            </li>
+            <li>
+              <span class="mono">04 / THE POINT OF IT ALL</span>
+              <h3>Play it in PhantomHunt</h3>
+              <p>Find out whether it follows the game.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section
+        class="section notes-section"
+        id="notes"
+        aria-labelledby="notes-title"
+      >
+        <div class="notes-heading">
+          <span class="mono">THE SMALL PRINT, WORTH READING</span>
+          <h2 id="notes-title">Notes from the workbench.</h2>
+        </div>
+        <details class="disclosure" id="limitations">
+          <summary>
+            <span><span class="mono">01</span> What this still can’t do</span
+            ><span aria-hidden="true">+</span>
+          </summary>
+          <div class="details-columns">
+            <div>
+              <h3>v1 / Continuation, with caveats</h3>
+              <p>
+                Quality depends on the prompt and checkpoint. MAESTRO is small
+                and stylistically narrow. My random file split can put related
+                pieces on both sides, flattering validation loss. The demo is a
+                selected sample. The intensity editor is experimental and not a
+                note-preserving live editor.
+              </p>
+            </div>
+            <div>
+              <h3>v2 / A player needs a conductor</h3>
+              <p>
+                Continuous notes do not make long-form structure. The game needs
+                a conductor to bring themes back and set controls. Listening
+                tests and the full game loop are still ahead. Both versions take
+                musical context, not text prompts.
+              </p>
+            </div>
+          </div>
+        </details>
+        <details class="disclosure" id="pipeline">
+          <summary>
+            <span
+              ><span class="mono">02</span> Inside the original GPT-2
+              workflow</span
+            ><span aria-hidden="true">+</span>
+          </summary>
+          <div>
+            <p>
+              Split MIDI files → transpose only the training split → tokenize
+              with MidiTok REMI → train on 2,048-token windows → compare
+              checkpoints → generate MIDI.
+            </p>
+            <dl class="inline-specs">
+              <div>
+                <dt>Layers</dt>
+                <dd>12</dd>
+              </div>
+              <div>
+                <dt>Attention heads</dt>
+                <dd>12</dd>
+              </div>
+              <div>
+                <dt>Embedding size</dt>
+                <dd>768</dd>
+              </div>
+              <div>
+                <dt>Vocabulary</dt>
+                <dd>423</dd>
+              </div>
+            </dl>
+            <p>
+              The public repository contains the v1 workflow. Datasets and
+              checkpoints stay local. The v2 code is not public.
+            </p>
+          </div>
+        </details>
+        <details class="disclosure" id="run-local">
+          <summary>
+            <span><span class="mono">03</span> Run v1 locally</span
+            ><span aria-hidden="true">+</span>
+          </summary>
+          <div>
+            <p>
+              Training and generation need your own local data and checkpoint.
+              Start with the dependency smoke check:
+            </p>
+            <pre><code>python3 -m pip install -r requirements-smoke.txt
+python3 -m unittest tests.test_dependency_smoke</code></pre>
+            <p>Then prepare, train, and generate:</p>
+            <pre><code>python3 scripts/prepare_12k_split.py
+python3 scripts/augment_train_transpose.py
+python3 scripts/tokenize_12k_augmented.py
+python3 scripts/train_gpt2_piano_12k.py --train-from-scratch
+python3 scripts/generate_piano_sample.py --checkpoint checkpoints/best</code></pre>
+            <a
+              class="text-link"
+              href="https://github.com/HerRei/gpt2-piano-mps-12k"
+              >Read the full README ↗</a
+            >
+          </div>
+        </details>
+        <details class="disclosure">
+          <summary>
+            <span><span class="mono">04</span> Data, sound, and licenses</span
+            ><span aria-hidden="true">+</span>
+          </summary>
+          <div>
+            <p>
+              Aria-MIDI is CC BY-NC-SA, so this v2 work is for non-commercial
+              use. MAESTRO has separate CC BY-NC-SA terms too. The repository’s
+              MIT license covers its code, not its training data.
+            </p>
+            <p>
+              The v1 clip uses Salamander Grand Piano by Alexander Holm under
+              <a
+                class="text-link"
+                href="https://creativecommons.org/licenses/by/3.0/"
+                >CC BY 3.0</a
+              >. Long pauses in the selected continuation were shortened. Future
+              v2 samples will also use a freely licensed piano.
+            </p>
+          </div>
+        </details>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-top">
+        <p>The next bar<br />is <em>still unwritten.</em></p>
+        <a
+          class="button button-acid"
+          href="https://github.com/HerRei/gpt2-piano-mps-12k"
+          >Explore the v1 code <svg><use href="#arrow-up" /></svg
+        ></a>
+      </div>
+      <div class="footer-bottom mono">
+        <span>HERMES / PIANO MODEL</span><span>GPT-2 → RWKV-7</span
+        ><a href="#top">BACK TO TOP ↑</a>
+      </div>
+    </footer>
+  </body>
+</html>
