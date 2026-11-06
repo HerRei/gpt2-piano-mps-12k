@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this code or these weights, please cite them as below."
+title: "GPT-2 piano and RWKV-7 piano: two small symbolic piano models"
+authors:
+  - family-names: Reisner
+    given-names: Hermes
+repository-code: "https://github.com/HerRei/gpt2-piano-mps-12k"
+url: "https://herrei.github.io/gpt2-piano-mps-12k/"
+license: MIT
+version: "2026.11"
+date-released: "2026-11-06"
+keywords:
+  - symbolic music
+  - piano
+  - MIDI
+  - GPT-2
+  - RWKV-7

@@ -1,0 +1,15 @@
+The model weights published with this repository (v1-gpt2-piano.safetensors and v2-rwkv7-piano.safetensors,
+attached to its GitHub releases) are licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+International License (CC BY-NC-SA 4.0): https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Copyright (c) 2026 Hermes Reisner
+
+The weights were trained on data under the same licence:
+
+- v1: MAESTRO v3.0.0, Curtis Hawthorne et al., "Enabling Factorized Piano Music Modeling and Generation with the
+  MAESTRO Dataset", ICLR 2019. https://magenta.tensorflow.org/datasets/maestro
+- v2: Aria-MIDI (pruned release), Louis Bradshaw and Simon Colton, "Aria-MIDI: A Dataset of Piano MIDI Files for
+  Symbolic Music Modeling", ICLR 2025. https://github.com/loubbrad/aria-midi
+
+Please treat music generated with the weights as non-commercial as well. The code in this repository is
+licensed separately under the MIT License (see LICENSE).
