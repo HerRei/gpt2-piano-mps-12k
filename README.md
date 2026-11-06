@@ -75,8 +75,11 @@ python v2/generate.py --weights v2-rwkv7-piano.safetensors --plan 2,1:20 5,3:20 
 v1, continuing a piece:
 
 ```bash
-python v1/generate.py --weights v1-gpt2-piano.safetensors --prompt piece.mid --out continued.mid
+python v1/generate.py --weights v1-gpt2-piano.safetensors --prompt piece.mid --prompt_seconds 20 --seconds 40 \
+    --out continued.mid
 ```
+
+Without the two seconds options it continues the last 512 tokens of the file by 1,024 tokens.
 
 Both scripts write MIDI and make no sound; any piano sampler or DAW plays the result. On the CPU, v2 takes
 about 18 ms per token in plain PyTorch. On a Mac, `v2/coreml.py` (needs `pip install coremltools`) converts it

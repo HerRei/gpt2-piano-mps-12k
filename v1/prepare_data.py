@@ -15,6 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import pretty_midi
+from symusic import Score
 
 TRANSPOSE = (-3, -2, -1, 1, 2, 3)
 PIANO_LOW, PIANO_HIGH = 21, 108
@@ -37,7 +38,7 @@ def remi():
 
 
 def ids_of(tokenizer, path):
-    tok = tokenizer(str(path))
+    tok = tokenizer(path if isinstance(path, Score) else str(path))
     if isinstance(tok, list):
         if len(tok) != 1:
             raise ValueError(f"expected one token stream, got {len(tok)}")

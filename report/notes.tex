@@ -131,9 +131,10 @@ mean & 1.855 & 1.793 & 1.749 \\
 was evaluated in fp16 with the released code (1.7491; the training log has 1.7493 in bf16).}
 \end{table}
 
-Notes carry most of the remaining loss: which pitch comes next is where the music is decided. v1's validation
-loss, over the 2,048-token windows of the 63 validation files, was 1.501, 1.413 and 1.448 after epochs one to
-three.
+Notes carry most of the remaining loss: which pitch comes next is where the music is decided.
+
+v1's validation loss, over the 2,048-token windows of the 63 validation files, was 1.501, 1.413, 1.448 and 1.478
+after epochs one to four, while its training loss kept falling to about 1.10.
 
 \subsection{Following the controls}
 
@@ -165,8 +166,8 @@ controls, does not. So the default is no guidance, which keeps the cost at one m
 
 \subsection{Comparison with real playing}
 
-96 held-out Aria-MIDI recordings (one per recording, no silent five seconds in the first minute) supply the first
-20 seconds; each model continues for 40 seconds without controls or guidance, two samples per piece. A logistic
+96 recordings from v2's validation split (one file each, no silent five seconds in the first minute) supply the
+first 20 seconds; each model continues for 40 seconds without controls or guidance, two samples per piece. A logistic
 regression on 22 features of seconds 20 to 60 tries to tell the real continuation from the model's. The features
 include key fit, notes outside the key, interval, pitch-class and rhythm variety, leaps, range, loudness spread, note
 density, polyphony and how often a short figure repeats. It is scored by five-fold cross-validation grouped by
@@ -283,6 +284,7 @@ it.
 \item The speed numbers are model steps on one laptop. Running next to a game has not been measured.
 \end{itemize}
 
+{\raggedright
 \begin{thebibliography}{9}
 \bibitem{maestro} C.~Hawthorne et al., ``Enabling Factorized Piano Music Modeling and Generation with the MAESTRO
 Dataset,'' ICLR 2019.
@@ -294,5 +296,6 @@ Expressive Pop Piano Compositions,'' ACM Multimedia 2020.
 \bibitem{miditok} N.~Fradet et al., ``MidiTok: A Python Package for MIDI File Tokenization,'' ISMIR 2021, late-breaking demo.
 \bibitem{fla} S.~Yang and Y.~Zhang, flash-linear-attention, \url{https://github.com/fla-org/flash-linear-attention}.
 \end{thebibliography}
+}
 
 \end{document}
