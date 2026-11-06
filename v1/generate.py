@@ -23,7 +23,7 @@ from transformers import GPT2LMHeadModel
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from prepare_data import ids_of, remi
-from train import gpt2_config
+from train import device, gpt2_config
 
 BLOCK, KEEP = 2048, 1536
 
@@ -57,7 +57,7 @@ def main():
     if unexpected or set(missing) - {"lm_head.weight"}:
         raise SystemExit(f"weights do not match the v1 model: missing {missing}, unexpected {unexpected}")
     model.tie_weights()
-    dev = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+    dev = device()
     model.to(dev).eval()
     torch.manual_seed(a.seed)
 
@@ -79,7 +79,8 @@ def main():
         x = torch.tensor([ctx], device=dev)
         with torch.no_grad():
             out = model.generate(x, attention_mask=torch.ones_like(x), do_sample=True, temperature=a.temp,
-                                 top_p=a.top_p, max_new_tokens=n, pad_token_id=tok.pad_token_id)
+                                 top_p=a.top_p, max_new_tokens=n, pad_token_id=tok.pad_token_id,
+                                 use_cache=True)
         return out[0, len(ctx):].tolist()
 
     if a.seconds is None:
